@@ -1,4 +1,5 @@
 require 'rpcoder/param'
+require 'camelizer'
 
 module RPCoder
   class Function

@@ -1,3 +1,5 @@
+require 'camelizer'
+
 module RPCoder
   class Param
     def self.original_types
@@ -17,9 +19,22 @@ module RPCoder
 
     def array_or_type
       if array?
-        "Array"
+        "#{to_c_sharp_type}[]"
       else
-        type
+        to_c_sharp_type
+      end
+    end
+
+    def to_c_sharp_type
+      case type
+      when :int
+        return :int?
+      when :String
+        return :string
+      when :Boolean
+        return :bool?
+      else
+        return type
       end
     end
 
