@@ -10,7 +10,7 @@ namespace <%= name_space %>
 
 		public <%= type.name %>() {}
 
-		public <%= type.name %>(<%= type.fields.map {|i| "#{i.array_or_type} #{i.name} = null" }.join(', ') %>)
+		public <%= type.name %>(<%= type.fields.map {|i| "#{i.array_or_type} #{i.name}" }.join(', ') %>)
 		{
 			<%- type.fields.each do |field| -%>
 			this.<%= field.name.to_s.camelize %> = <%= field.name %>;
@@ -19,8 +19,8 @@ namespace <%= name_space %>
 
 		public override string ToString()
 		{
-			string[] resultString = {<%= type.fields.map {|i| "\"#{i.name.to_s.camelize}:\" + #{i.name.to_s.camelize}" }.join(', ') %>};
-			return string.Join(", ", resultString);
+			string[] strResult = {<%= type.fields.map {|i| "\"#{i.name.to_s.camelize}:\" + #{i.name.to_s.camelize}" }.join(', ') %>};
+			return string.Join(", ", strResult);
 		}
 	}
 }

@@ -2,172 +2,104 @@
 
 package <%= name_space %>
 {
-    import mx.rpc.AsyncResponder;
-    import mx.rpc.AsyncToken;
-    import mx.rpc.events.ResultEvent;
-    import mx.rpc.events.FaultEvent;
-    import mx.rpc.http.HTTPService;
-    import com.adobe.serialization.json.JSON;
+	public class <%= api_class_name %> : <%= api_class_name %>Interface
+	{
+		public const int CONTINUE                        = 100;
+		public const int SWITCHING_PROTOCOLS             = 101;
+		public const int PROCESSING                      = 102;
+		public const int OK                              = 200;
+		public const int CREATED                         = 201;
+		public const int ACCEPTED                        = 202;
+		public const int NON_AUTHORITATIVE_INFORMATION   = 203;
+		public const int NO_CONTENT                      = 204;
+		public const int RESET_CONTENT                   = 205;
+		public const int PARTIAL_CONTENT                 = 206;
+		public const int MULTI_STATUS                    = 207;
+		public const int IM_USED                         = 226;
+		public const int MULTIPLE_CHOICES                = 300;
+		public const int MOVED_PERMANENTLY               = 301;
+		public const int FOUND                           = 302;
+		public const int SEE_OTHER                       = 303;
+		public const int NOT_MODIFIED                    = 304;
+		public const int USE_PROXY                       = 305;
+		public const int RESERVED                        = 306;
+		public const int TEMPORARY_REDIRECT              = 307;
+		public const int BAD_REQUEST                     = 400;
+		public const int UNAUTHORIZED                    = 401;
+		public const int PAYMENT_REQUIRED                = 402;
+		public const int FORBIDDEN                       = 403;
+		public const int NOT_FOUND                       = 404;
+		public const int METHOD_NOT_ALLOWED              = 405;
+		public const int NOT_ACCEPTABLE                  = 406;
+		public const int PROXY_AUTHENTICATION_REQUIRED   = 407;
+		public const int REQUEST_TIMEOUT                 = 408;
+		public const int CONFLICT                        = 409;
+		public const int GONE                            = 410;
+		public const int LENGTH_REQUIRED                 = 411;
+		public const int PRECONDITION_FAILED             = 412;
+		public const int REQUEST_ENTITY_TOO_LARGE        = 413;
+		public const int REQUEST_URI_TOO_LONG            = 414;
+		public const int UNSUPPORTED_MEDIA_TYPE          = 415;
+		public const int REQUESTED_RANGE_NOT_SATISFIABLE = 416;
+		public const int EXPECTATION_FAILED              = 417;
+		public const int UNPROCESSABLE_ENTITY            = 422;
+		public const int LOCKED                          = 423;
+		public const int FAILED_DEPENDENCY               = 424;
+		public const int UPGRADE_REQUIRED                = 426;
+		public const int INTERNAL_SERVER_ERROR           = 500;
+		public const int NOT_IMPLEMENTED                 = 501;
+		public const int BAD_GATEWAY                     = 502;
+		public const int SERVICE_UNAVAILABLE             = 503;
+		public const int GATEWAY_TIMEOUT                 = 504;
+		public const int HTTP_VERSION_NOT_SUPPORTED      = 505;
+		public const int VARIANT_ALSO_NEGOTIATES         = 506;
+		public const int INSUFFICIENT_STORAGE            = 507;
+		public const int NOT_EXTENDED                    = 510;
 
-    public class <%= api_class_name %> implements <%= api_class_name %>Interface
-    {
-        public static const CONTINUE :int                        = 100;
-        public static const SWITCHING_PROTOCOLS :int             = 101;
-        public static const PROCESSING :int                      = 102;
-        public static const OK :int                              = 200;
-        public static const CREATED :int                         = 201;
-        public static const ACCEPTED :int                        = 202;
-        public static const NON_AUTHORITATIVE_INFORMATION :int   = 203;
-        public static const NO_CONTENT :int                      = 204;
-        public static const RESET_CONTENT :int                   = 205;
-        public static const PARTIAL_CONTENT :int                 = 206;
-        public static const MULTI_STATUS :int                    = 207;
-        public static const IM_USED :int                         = 226;
-        public static const MULTIPLE_CHOICES :int                = 300;
-        public static const MOVED_PERMANENTLY :int               = 301;
-        public static const FOUND :int                           = 302;
-        public static const SEE_OTHER :int                       = 303;
-        public static const NOT_MODIFIED :int                    = 304;
-        public static const USE_PROXY :int                       = 305;
-        public static const RESERVED :int                        = 306;
-        public static const TEMPORARY_REDIRECT :int              = 307;
-        public static const BAD_REQUEST :int                     = 400;
-        public static const UNAUTHORIZED :int                    = 401;
-        public static const PAYMENT_REQUIRED :int                = 402;
-        public static const FORBIDDEN :int                       = 403;
-        public static const NOT_FOUND :int                       = 404;
-        public static const METHOD_NOT_ALLOWED :int              = 405;
-        public static const NOT_ACCEPTABLE :int                  = 406;
-        public static const PROXY_AUTHENTICATION_REQUIRED :int   = 407;
-        public static const REQUEST_TIMEOUT :int                 = 408;
-        public static const CONFLICT :int                        = 409;
-        public static const GONE :int                            = 410;
-        public static const LENGTH_REQUIRED :int                 = 411;
-        public static const PRECONDITION_FAILED :int             = 412;
-        public static const REQUEST_ENTITY_TOO_LARGE :int        = 413;
-        public static const REQUEST_URI_TOO_LONG :int            = 414;
-        public static const UNSUPPORTED_MEDIA_TYPE :int          = 415;
-        public static const REQUESTED_RANGE_NOT_SATISFIABLE :int = 416;
-        public static const EXPECTATION_FAILED :int              = 417;
-        public static const UNPROCESSABLE_ENTITY :int            = 422;
-        public static const LOCKED :int                          = 423;
-        public static const FAILED_DEPENDENCY :int               = 424;
-        public static const UPGRADE_REQUIRED :int                = 426;
-        public static const INTERNAL_SERVER_ERROR :int           = 500;
-        public static const NOT_IMPLEMENTED :int                 = 501;
-        public static const BAD_GATEWAY :int                     = 502;
-        public static const SERVICE_UNAVAILABLE :int             = 503;
-        public static const GATEWAY_TIMEOUT :int                 = 504;
-        public static const HTTP_VERSION_NOT_SUPPORTED :int      = 505;
-        public static const VARIANT_ALSO_NEGOTIATES :int         = 506;
-        public static const INSUFFICIENT_STORAGE :int            = 507;
-        public static const NOT_EXTENDED :int                    = 510;
+		private string _baseUrl;
+		delegate void errorHandler(int errorType, string errorMessage, string nextScene);
 
-        private var _baseUrl:String;
-        private var _errorHandler : Function;
+		public void <%= api_class_name %>(string baseUrl)
+		{
+			this._baseUrl = baseUrl;
+		}
+		
+		public string BaseUrl { get; }
+		public errorHandler ErrorHandler { get; set; }
 
-        public function <%= api_class_name %>(baseUrl:String)
-        {
-            this._baseUrl = baseUrl;
-        }
+		<%- functions.each do |func| -%>
+		/**
+		* <%= func.description %>
+		*
+		<%- func.params.each do |param| -%>
+		* @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		<%- end -%>
+		* @success:Function
+		* @error:Function
+		*/
+		delegate void <%= func.name %>Responder(<%= func.return_types.map{|i| [i.type, i.name].join(' ') }.join(', ') %>);
+		
+		<%-
+			params = func.params.map{|i| [i.type, i.name].join(' ') } + [func.name + 'Responder success', 'errorHandler error']
+		-%>
+		public IEnumerator <%= func.name %>(<%= params.join(', ') %>)
+		{
+			string path = "<%= func.path %>";
+			
+			WWW www = new WWW(this.baseUrl + path);
+			yield return www;
 
-        public function get baseUrl():String
-        {
-            return this._baseUrl;
-        }
-
-        public function set errorHandler(handler : Function):void
-        {
-            this._errorHandler = handler;
-        }
-
-        public function get errorHandler():Function
-        {
-            return this._errorHandler;
-        }
-
-        <%- functions.each do |func| -%>
-        /**
-        * <%= func.description %>
-        *
-        <%- func.params.each do |param| -%>
-        * @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
-        <%- end -%>
-        * @success:Function
-        * @error:Function
-        */
-        <%-
-            params = func.params.map{|i| [i.name, i.type].join(':') } + ['success:Function', 'error:Function = null']
-        -%>
-        public function <%= func.name %>(<%= params.join(', ') %>):void
-        {
-            var params:Object = {<%= func.query_params.map { |i| "\"#{i.name}\":#{i.name}" }.join(', ') %>};
-            request("<%= func.method %>", <%= func.path_parts.join(' + ') %>, params,
-                function(e:ResultEvent, t:Object):void {
-                    t = t; // FIXME: for removing warning
-                    var hash:Object = JSON.decode(e.result as String);
-
-                    <%- func.return_types.each do |param| -%>
-                    <%- if param.array? -%>
-                    var <%= param.name %>_list:Array = new Array();
-                    for each (var <%= param.name %>:Object in hash['<%= param.name %>'])
-                        <%= param.name %>_list.push(<%= param.instance_creator(param.name) %>);
-                    <%- end -%>
-                    <%- end -%>
-
-                    <%-
-                      args = []
-                      if func.has_return_type?
-                        args = func.return_types.map {|param|
-                          if param.array?
-                            "#{param.name}_list"
-                          else
-                            param.instance_creator("hash['#{param.name}']")
-                          end
-                        }
-                      end
-                    -%>
-                    success(<%= args.join(', ') %>);
-                }, error);
-        }
-
-        <%- end -%>
-        public function request(method:String, path:String, params:Object, success:Function, error:Function):void
-        {
-            var service:HTTPService = createHttpService(this.baseUrl);
-            service.method = method;
-            service.url = path;
-            service.request = params;
-            service.resultFormat = 'text';
-            var token:AsyncToken = service.send();
-            token.addResponder(new AsyncResponder(
-                success,
-                function(e:FaultEvent, t:Object):void {
-                    var handler : Function;
-                    if (error !== null) {
-                        handler = error;
-                    } else {
-                        handler = _errorHandler;
-                    }
-                    switch ( handler.length )
-                    {
-                        case 0:
-                            handler.call(this);
-                            break;
-                        case 1:
-                            handler.call(this, e);
-                            break;
-                        case 2:
-                            handler.call(this, e, t);
-                            break;
-                    }
-                }
-            ));
-        }
-
-        public function createHttpService(baseUrl:String) : HTTPService
-        {
-            return new HTTPService(baseUrl);
-        }
-    }
+			if(www.error != null)
+			{
+				error();
+			}
+			else
+			{
+				Data[] d = JsonMapper.ToObject<Data[]> (www.text);
+				success();
+				Debug.Log(d);
+			}
+		}
+		<%- end -%>
+	}
 }
