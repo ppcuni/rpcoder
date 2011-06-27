@@ -9,7 +9,7 @@ module RPCoder
     def params
       @params ||= []
     end
-
+	
     def return_types
       @return_types ||= []
     end
@@ -40,6 +40,10 @@ module RPCoder
       params.select { |i| !param_strs.include?(i.name.to_s)  }
     end
 
+    def has_query_params?
+      !query_params.empty?
+    end
+	
     def add_return_type(name, type, options = {})
       return_types << Param.new(name, type, options)
     end

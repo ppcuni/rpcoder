@@ -26,7 +26,7 @@ module RPCoder
     end
 
     def to_c_sharp_type
-      case type
+      case type.to_sym
       when :int
         return :int?
       when :String

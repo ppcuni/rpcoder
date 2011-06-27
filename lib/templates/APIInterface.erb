@@ -5,26 +5,29 @@ namespace <%= name_space %>
 	public interface <%= api_class_name %>Interface
 	{
 		delegate void handler();
-		delegate void errorDelegate(int errorType, string errorMessage, string nextScene);
+		public delegate void errorHandler(string errorType, string message, string targetScene);
 		string BaseUrl { get; set; }
 		handler ErrorHandler{ get; set; }
-//		function set errorHandler(handler : Function):void;
-//		function get errorHandler():Function;
 		
 		<%- functions.each do |func| -%>
+		<%-
+			successHandler = func.name.camelize + "Responder"
+		-%>
 		/**
 		* <%= func.description %>
 		*
 		<%- func.params.each do |param| -%>
-		* @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		* @<%= param.name %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
-		* @success:Function
-		* @error:Function
+		* @success:<%= successHandler %>
+		* @error:errorHandler
 		*/
+		public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name].join(' ') }.join(', ') %>);
+		
 		<%-
-			params = func.params.map{|i| [i.type, i.name].join(' ') } + ['success:Function', 'errorDelegate error']
+			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'errorHandler error']
 		-%>
-		void <%= func.name %>(<%= params.join(', ') %>);
+		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		<%- end -%>
 	}
 }
