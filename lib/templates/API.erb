@@ -59,7 +59,9 @@ namespace <%= name_space %>
 			}
 			else
 			{
+				<%- if func.has_return_type? -%>
 				JsonData jsonData = JsonMapper.ToObject (www.text);
+				<%- end -%>
 				<%-
 					args = []
 					if func.has_return_type?
