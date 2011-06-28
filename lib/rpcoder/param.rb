@@ -19,7 +19,7 @@ module RPCoder
 
     def array_or_type
       if array?
-        "#{to_c_sharp_type}[]"
+        "List<#{to_c_sharp_type}>"
       else
         to_c_sharp_type
       end

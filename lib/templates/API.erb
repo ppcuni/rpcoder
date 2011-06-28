@@ -3,6 +3,7 @@ using UnityEngine;
 using LitJson;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 namespace <%= name_space %>
 {
@@ -12,11 +13,9 @@ namespace <%= name_space %>
 		public const string RETENTION	= "RETENTION";
 		public const string TRANSITION	= "TRANSITION";
 		
-		public delegate void ErrorFunction(string errorType, string message, string targetScene);
-
 		public string BaseUrl { get; protected set; }
 		public string DefaultErrorMessage { get; set; }
-		public ErrorFunction ErrorHandler { get; set; }
+		public RpcoderErrorHandler ErrorHandler { get; set; }
 		
 		public <%= api_class_name %>(string baseUrl)
 		{
@@ -35,12 +34,10 @@ namespace <%= name_space %>
 		* @<%= param.name %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
 		* @success:<%= successHandler %>
-		* @error:ErrorFunction
+		* @error:RpcoderErrorHandler
 		*/
-		public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name].join(' ') }.join(', ') %>);
-		
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'ErrorFunction error']
+			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
@@ -67,13 +64,26 @@ namespace <%= name_space %>
 					args = []
 					if func.has_return_type?
 						args = func.return_types.map {|param|
-							"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+							if param.array?
+								if param.original_type?
+									"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+								else
+									"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+								end
+							else
+								if param.original_type?
+									"(#{param.type})jsonData[\"#{param.name}\"]"
+								else
+									"#{param.type}.Create(jsonData[\"#{param.name}\"])"
+								end
+							end
 						}
 					end
 				-%>
 				success(<%= args.join(', ') %>);
 			}
 		}
+		
 		<%- end -%>
 	}
 }

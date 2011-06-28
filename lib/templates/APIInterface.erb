@@ -2,12 +2,21 @@
 
 namespace <%= name_space %>
 {
+	using System.Collections;
+	using System.Collections.Generic;
+
+	public delegate void RpcoderErrorHandler(string errorType, string message, string targetScene);
+	<%- functions.each do |func| -%>
+	<%-
+		successHandler = func.name.camelize + "Responder"
+	-%>
+	public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name].join(' ') }.join(', ') %>);
+	<%- end -%>
+	
 	public interface <%= api_class_name %>Interface
 	{
-		delegate void handler();
-		public delegate void errorHandler(string errorType, string message, string targetScene);
-		string BaseUrl { get; set; }
-		handler ErrorHandler{ get; set; }
+		string BaseUrl { get; }
+		RpcoderErrorHandler ErrorHandler{ get; set; }
 		
 		<%- functions.each do |func| -%>
 		<%-
@@ -20,14 +29,13 @@ namespace <%= name_space %>
 		* @<%= param.name %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
 		* @success:<%= successHandler %>
-		* @error:errorHandler
+		* @error:RpcoderErrorHandler
 		*/
-		public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name].join(' ') }.join(', ') %>);
-		
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'errorHandler error']
+			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
-		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
+		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>);
+		
 		<%- end -%>
 	}
 }

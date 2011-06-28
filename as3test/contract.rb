@@ -16,8 +16,9 @@ RPCoder.type "Mail" do |t|
   t.add_field :subject, :String
   t.add_field :body,    :String
   t.add_field :isRead,  :Boolean
-  t.add_field :target,  :String #{ :array? => true }
+  t.add_field :target,  :String, { :array? => true }
   t.add_field :next,  :Mail
+  t.add_field :nextList,  :Mail, { :array? => true }
 end
 
 RPCoder.function "ggl" do |f|
@@ -25,6 +26,8 @@ RPCoder.function "ggl" do |f|
   f.method      = "GET"
   f.add_return_type :mail, "Mail"
   f.add_return_type :mailList, "Mail", { :array? => true }
+  f.add_return_type :num, "int"
+  f.add_return_type :booleanList, "Boolean", { :array? => true }
   f.add_param  :q, "String"
   f.add_param  :b, :int
   f.add_param  :nya, "String"

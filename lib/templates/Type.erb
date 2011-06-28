@@ -2,6 +2,9 @@
 
 namespace <%= name_space %>
 {
+	using System.Collections.Generic;
+	using LitJson;
+	
 	public class <%= type.name %>
 	{
 		<%- type.fields.each do |field| -%>
@@ -19,8 +22,67 @@ namespace <%= name_space %>
 
 		public override string ToString()
 		{
-			string[] strResult = {<%= type.fields.map {|i| "\"#{i.name.to_s.camelize}:\" + #{i.name.to_s.camelize}" }.join(', ') %>};
+			<%- type.fields.each do |field| -%>
+			<%- if field.array? -%>
+			<%-
+				list_name = field.name.to_s + "ListString"
+			-%>
+			string <%= list_name %> = "[";
+			if(<%= field.name.to_s.camelize %> != null)
+			{
+				foreach(<%= field.to_c_sharp_type %> i in <%= field.name.to_s.camelize %>)
+				{
+					<%= list_name %> += i + ", ";
+				}
+			}
+			<%= list_name %> += "]";
+			<%- end -%>
+			<%- end -%>
+			
+			string[] strResult = {<%= type.fields.map {|i| "\"#{i.name.to_s.camelize}:\" + #{unless i.array? then i.name.to_s.camelize else i.name.to_s + 'ListString' end}" }.join(', ') %>};
 			return string.Join(", ", strResult);
+		}
+		
+		public static <%= type.name %> Create(JsonData jsonData)
+		{
+			<%= type.name %> createdData = new <%= type.name %>();
+			
+			<%- type.fields.each do |field| -%>
+			try
+			{
+				<%- if field.original_type? -%>
+				<%- if field.array? -%>
+				createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(jsonData["<%= field.name.to_s %>"].ToJson());
+				<%- else -%>
+				createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)jsonData["<%= field.name.to_s %>"];
+				<%- end -%>
+				<%- else -%>
+				<%- if field.array? -%>
+				createdData.<%= field.name.to_s.camelize %> = <%= type.name %>.CreateList(jsonData["<%= field.name.to_s %>"]);
+				<%- else -%>
+				createdData.<%= field.name.to_s.camelize %> = <%= type.name %>.Create(jsonData["<%= field.name.to_s %>"]);
+				<%- end -%>
+				<%- end -%>
+			}
+			catch(KeyNotFoundException)
+			{
+			}
+			
+			<%- end -%>
+			
+			return createdData;
+		}
+		
+		public static List<<%= type.name %>> CreateList(JsonData jsonData)
+		{
+			List<JsonData> jsonList = JsonMapper.ToObject<List<JsonData>>(jsonData.ToJson());
+			List<<%= type.name %>> createdList = new List<<%= type.name %>>();
+			foreach(JsonData i in jsonList)
+			{
+				createdList.Add(<%= type.name %>.Create(i));
+			}
+			
+			return createdList;
 		}
 	}
 }
