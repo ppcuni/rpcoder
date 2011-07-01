@@ -4,6 +4,7 @@ using LitJson;
 using System.Collections;
 using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace <%= name_space %>
 {
@@ -43,6 +44,7 @@ namespace <%= name_space %>
 		{
 			string path = <%= func.path_parts.join(' + ') %>;
 			
+			<%- if func.is_get? -%>
 			<%-
 				request_args = func.query_params.map{|i| "#{i.name}=\" + Uri.EscapeUriString(#{i.name}.ToString())" }
 			-%>
@@ -51,6 +53,17 @@ namespace <%= name_space %>
 			end %>
 			
 			WWW www = new WWW(this.BaseUrl + path);
+			<%- else -%>
+			JsonData data = new JsonData();
+			
+			<%- func.query_params.each do |i| -%>
+			data["<%= i.name.to_s %>"] = <%= i.name.to_s %>;
+			<%- end -%>
+			
+			byte[] byteArray = Encoding.Unicode.GetBytes(data.ToJson());
+			
+			WWW www = new WWW(this.BaseUrl + path, byteArray);
+			<%- end -%>
 			yield return www;
 
 			if(www.error != null)

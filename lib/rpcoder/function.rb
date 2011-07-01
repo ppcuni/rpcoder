@@ -43,7 +43,15 @@ module RPCoder
     def has_query_params?
       !query_params.empty?
     end
-	
+    
+    def is_get?
+      if method == "GET"
+        return true
+      else
+        return false
+      end
+    end
+    
     def add_return_type(name, type, options = {})
       return_types << Param.new(name, type, options)
     end

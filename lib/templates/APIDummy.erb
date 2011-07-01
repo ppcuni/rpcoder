@@ -2,92 +2,99 @@
 
 package <%= name_space %>
 {
-//	import mx.rpc.events.FaultEvent;
+    import mx.rpc.events.FaultEvent;
 
-	public class <%= api_class_name %>Dummy : <%= api_class_name %>Interface
-	{
-		delegate void handler();
-		delegate void dummySuccess();
-		delegate void errorDelegate(int errorType, string errorMessage, string nextScene);
-		
-		private string _baseUrl;
-		private handler _errorHandler;
-		
-		public string BaseUrl { get; set; }
-		
-		private bool[] _errors;
-		private dummySuccess[] _dummy_success;
-		
-		public void SetDummySuccess(string function_name, dummySuccess success)
-		{
-			_dummy_success[function_name] = success;
-		}
-		
-		private dummySuccess[] GetDummySuccess(string function_name)
-		{
-			return _dummy_success[function_name];
-		}
-		
-		public void SetDummyError(string function_name, bool is_error)
-		{
-			_errors[function_name] = is_error;
-		}
-		
-		private bool IsError(string function_name)
-		{
-			return _errors[function_name];
-		}
-		
-		<%- functions.each do |func| -%>
-		/**
-		* <%= func.description %>
-		*
-		<%- func.params.each do |param| -%>
-		* @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
-		<%- end -%>
-		* @success:Function
-		* @error:Function
-		*/
-		<%-
-			params = func.params.map{|i| [i.type, i.name].join(' ') } + ['dummySuccess success', 'error:Function = null']
-		-%>
-		
-		public void <%= func.name %>(<%= params.join(', ') %>)
-		{
-			RequestDummy("<%= func.name %>", success, error);
-		}
-		
-		<%- end -%>
-		
-		public void RequestDummy(string function_name, dummySuccess success, error:Function)
-		{
-			if ( IsError(function_name) )
-			{
-				var e:FaultEvent = new FaultEvent("dummy fault");
-				var t:Object = this;
-				var handler : Function;
-				if (error !== null) {
-					handler = error;
-				} else {
-					handler = _errorHandler;
-				}
-				switch ( handler.length )
-				{
-					case 0:
-						handler.call(this);
-						break;
-					case 1:
-						handler.call(this, e);
-						break;
-					case 2:
-						handler.call(this, e, t);
-						break;
-				}
-			}
-			else
-			{
-				success.apply(this, GetDummySuccess(function_name));
-			}
-		}
-	}
+    public class <%= api_class_name %>Dummy implements <%= api_class_name %>Interface
+    {
+        private var _baseUrl:String;
+        private var _errorHandler : Function;
+
+        public function get baseUrl():String
+        {
+            return this._baseUrl;
+        }
+
+        public function set errorHandler(handler : Function):void
+        {
+            this._errorHandler = handler;
+        }
+
+        public function get errorHandler():Function
+        {
+            return this._errorHandler;
+        }
+
+        private var _errors:Array = new Array();
+        private var _dummy_success:Array = new Array();
+
+        public function setDummySuccess(function_name:String, success:Array):void
+        {
+            _dummy_success[function_name] = success;
+        }
+
+        private function getDummySuccess(function_name:String):Array
+        {
+            return _dummy_success[function_name];
+        }
+
+        public function setDummyError(function_name:String, is_error:Boolean):void
+        {
+            _errors[function_name] = is_error;
+        }
+
+        private function isError(function_name:String):Boolean
+        {
+            return _errors[function_name];
+        }
+
+        <%- functions.each do |func| -%>
+        /**
+        * <%= func.description %>
+        *
+        <%- func.params.each do |param| -%>
+        * @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+        <%- end -%>
+        * @success:Function
+        * @error:Function
+        */
+        <%-
+            params = func.params.map{|i| [i.name, i.type].join(':') } + ['success:Function', 'error:Function = null']
+        -%>
+        public function <%= func.name %>(<%= params.join(', ') %>):void
+        {
+            requestDummy('<%= func.name %>', success, error);
+        }
+
+        <%- end -%>
+        public function requestDummy(function_name:String, success:Function, error:Function):void
+        {
+            if ( isError(function_name) )
+            {
+                var e:FaultEvent = new FaultEvent("dummy fault");
+                var t:Object = this;
+                var handler : Function;
+                if (error !== null) {
+                    handler = error;
+                } else {
+                    handler = _errorHandler;
+                }
+                switch ( handler.length )
+                {
+                    case 0:
+                        handler.call(this);
+                        break;
+                    case 1:
+                        handler.call(this, e);
+                        break;
+                    case 2:
+                        handler.call(this, e, t);
+                        break;
+                }
+            }
+            else
+            {
+                success.apply(this, getDummySuccess(function_name));
+            }
+        }
+    }
 }
