@@ -45,11 +45,7 @@ module RPCoder
     end
     
     def is_get?
-      if method == "GET"
-        return true
-      else
-        return false
-      end
+      true if method == "GET"
     end
     
     def add_return_type(name, type, options = {})
