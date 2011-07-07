@@ -5,6 +5,7 @@ namespace <%= name_space %>
 	using System.Collections;
 	using System.Collections.Generic;
 
+	public delegate void RpcoderLogger(string log);
 	public delegate void RpcoderErrorHandler(string errorType, string message, string targetScene);
 	<%- functions.each do |func| -%>
 	<%-
@@ -16,6 +17,9 @@ namespace <%= name_space %>
 	public interface <%= api_class_name %>Interface
 	{
 		string BaseUrl { get; }
+		RpcoderLogger Logger { get; set; } 
+		void AddCommonParameter(string key, string value);
+		string RemoveCommonParameter(string key);
 		RpcoderErrorHandler ErrorHandler{ get; set; }
 		
 		<%- functions.each do |func| -%>

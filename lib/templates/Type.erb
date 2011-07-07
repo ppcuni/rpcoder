@@ -58,9 +58,9 @@ namespace <%= name_space %>
 				<%- end -%>
 				<%- else -%>
 				<%- if field.array? -%>
-				createdData.<%= field.name.to_s.camelize %> = <%= type.name %>.CreateList(jsonData["<%= field.name.to_s %>"]);
+				createdData.<%= field.name.to_s.camelize %> = <%= field.type %>.CreateList(jsonData["<%= field.name.to_s %>"]);
 				<%- else -%>
-				createdData.<%= field.name.to_s.camelize %> = <%= type.name %>.Create(jsonData["<%= field.name.to_s %>"]);
+				createdData.<%= field.name.to_s.camelize %> = <%= field.type %>.Create(jsonData["<%= field.name.to_s %>"]);
 				<%- end -%>
 				<%- end -%>
 			}

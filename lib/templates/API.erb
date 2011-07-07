@@ -15,6 +15,30 @@ namespace <%= name_space %>
 		public const string TRANSITION	= "TRANSITION";
 		
 		public string BaseUrl { get; protected set; }
+		public RpcoderLogger Logger { get; set; } 
+		private void Log(string log)
+		{
+			if(Logger != null) Logger(log);
+		}
+
+		private Dictionary<string, string> commonParameterList = new Dictionary<string, string>();
+
+		public void AddCommonParameter(string key, string value)
+		{
+			commonParameterList.Add(key, value);
+		}
+
+		public string RemoveCommonParameter(string key)
+		{
+			string returnValue = "";
+			if (commonParameterList.ContainsKey(key))
+			{
+				returnValue = commonParameterList[key];
+				commonParameterList.Remove(key);
+			}
+			return returnValue;
+		}
+
 		public string DefaultErrorMessage { get; set; }
 		public RpcoderErrorHandler ErrorHandler { get; set; }
 		
@@ -43,24 +67,43 @@ namespace <%= name_space %>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
 			string path = <%= func.path_parts.join(' + ') %>;
-			
 			<%- if func.is_get? -%>
-			<%-
+			string argsPath = "";
+				<%-
 				request_args = func.query_params.map{|i| "#{i.name}=\" + Uri.EscapeUriString(#{i.name}.ToString())" }
-			-%>
-			<%= if func.has_query_params?
-					"path += \"?#{request_args.join(' + "&')};"
-			end %>
+				-%>
+				<%= if func.has_query_params?
+					"argsPath += \"?#{request_args.join(' + "&')};"
+				end %>
 			
-			WWW www = new WWW(this.BaseUrl + path);
+			foreach(string key in commonParameterList.Keys)
+			{
+				if(argsPath == "")
+				{
+					argsPath += "?";
+				}
+				else
+				{
+					argsPath += "&";
+				}
+				argsPath += Uri.EscapeUriString(key) + "=" + Uri.EscapeUriString(commonParameterList[key]);
+			}
+			string fullPath = this.BaseUrl + path + argsPath;
+			Log("request " + fullPath);
+			WWW www = new WWW(fullPath);
 			<%- else -%>
 			JsonData data = new JsonData();
 			
 			<%- func.query_params.each do |i| -%>
 			data["<%= i.name.to_s %>"] = <%= i.name.to_s %>;
 			<%- end -%>
+			foreach(string key in commonParameterList.Keys)
+			{
+				data[key] = commonParameterList[key];
+			}
 			
-			byte[] byteArray = Encoding.Unicode.GetBytes(data.ToJson());
+			byte[] byteArray = Encoding.UTF8.GetBytes(data.ToJson());
+			Log("request " + this.BaseUrl + path + " " + data.ToJson());
 			
 			WWW www = new WWW(this.BaseUrl + path, byteArray);
 			<%- end -%>
@@ -72,30 +115,38 @@ namespace <%= name_space %>
 			}
 			else
 			{
+				Log("<%= func.name.camelize %> responded " + www.text);
 				<%- if func.has_return_type? -%>
-				JsonData jsonData = JsonMapper.ToObject (www.text);
-				<%- end -%>
-				<%-
-					args = []
-					if func.has_return_type?
-						args = func.return_types.map {|param|
-							if param.array?
-								if param.original_type?
-									"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+				try
+				{
+					JsonData jsonData = JsonMapper.ToObject (www.text);
+					<%- end -%>
+					<%-
+						args = []
+						if func.has_return_type?
+							args = func.return_types.map {|param|
+								if param.array?
+									if param.original_type?
+										"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+									else
+										"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+									end
 								else
-									"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+									if param.original_type?
+										"(#{param.type})jsonData[\"#{param.name}\"]"
+									else
+										"#{param.type}.Create(jsonData[\"#{param.name}\"])"
+									end
 								end
-							else
-								if param.original_type?
-									"(#{param.type})jsonData[\"#{param.name}\"]"
-								else
-									"#{param.type}.Create(jsonData[\"#{param.name}\"])"
-								end
-							end
-						}
-					end
-				-%>
-				success(<%= args.join(', ') %>);
+							}
+						end
+					-%>
+					success(<%= args.join(', ') %>);
+				}
+				catch(JsonException)
+				{
+					error(RESTART, "Json parse Error", null);
+				}
 			}
 		}
 		
