@@ -48,6 +48,19 @@ namespace <%= name_space %>
 			DefaultErrorMessage = "";
 		}
 
+		private string AddQueryDelimiter(string source)
+		{
+			if(source == "")
+			{
+				source += "?";
+			}
+			else
+			{
+				source += "&";
+			}
+			return source;
+		}
+
 		<%- functions.each do |func| -%>
 		<%-
 			successHandler = func.name.camelize + "Responder"
@@ -69,23 +82,24 @@ namespace <%= name_space %>
 			string path = <%= func.path_parts.join(' + ') %>;
 			<%- if func.is_get? -%>
 			string argsPath = "";
-				<%-
-				request_args = func.query_params.map{|i| "#{i.name}=\" + Uri.EscapeUriString(#{i.name.to_s.camelize(false)}.ToString())" }
-				-%>
-				<%= if func.has_query_params?
-					"argsPath += \"?#{request_args.join(' + "&')};"
-				end %>
+			<%- if func.has_query_params? -%>
+			Dictionary<string, System.Object> args = new Dictionary<string, System.Object>();
+			<%- func.query_params.each do |i| -%>
+			if (<%= i.name.to_s.camelize(false) %> != null)
+			{
+				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+			}
+			<%- end -%>
+			foreach(string key in args.Keys)
+			{
+				argsPath = AddQueryDelimiter(argsPath);
+				argsPath += Uri.EscapeUriString(key) + "=" +  Uri.EscapeUriString(args[key].ToString());
+			}
+			<%- end -%>
 			
 			foreach(string key in commonParameterList.Keys)
 			{
-				if(argsPath == "")
-				{
-					argsPath += "?";
-				}
-				else
-				{
-					argsPath += "&";
-				}
+				argsPath = AddQueryDelimiter(argsPath);
 				argsPath += Uri.EscapeUriString(key) + "=" + Uri.EscapeUriString(commonParameterList[key]);
 			}
 			string fullPath = this.BaseUrl + path + argsPath;
@@ -94,9 +108,15 @@ namespace <%= name_space %>
 			<%- else -%>
 			JsonData data = new JsonData();
 			
+			<%- if func.has_query_params? -%>
 			<%- func.query_params.each do |i| -%>
-			data["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+			if (<%= i.name.to_s.camelize(false) %> != null)
+			{
+				data["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+			}
 			<%- end -%>
+			<%- end -%>
+
 			foreach(string key in commonParameterList.Keys)
 			{
 				data[key] = commonParameterList[key];
