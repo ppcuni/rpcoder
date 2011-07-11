@@ -25,7 +25,7 @@ namespace <%= name_space %>
 
 		public void AddCommonParameter(string key, string value)
 		{
-			commonParameterList.Add(key, value);
+			commonParameterList[key] = value;
 		}
 
 		public string RemoveCommonParameter(string key)
