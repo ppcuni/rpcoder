@@ -11,7 +11,7 @@ namespace <%= name_space %>
 	<%-
 		successHandler = func.name.camelize + "Responder"
 	-%>
-	public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name].join(' ') }.join(', ') %>);
+	public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') }.join(', ') %>);
 	<%- end -%>
 	
 	public interface <%= api_class_name %>Interface
@@ -30,13 +30,13 @@ namespace <%= name_space %>
 		* <%= func.description %>
 		*
 		<%- func.params.each do |param| -%>
-		* @<%= param.name %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		* @<%= param.name.to_s.camelize(false) %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
 		* @success:<%= successHandler %>
 		* @error:RpcoderErrorHandler
 		*/
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
+			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
 		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>);
 		

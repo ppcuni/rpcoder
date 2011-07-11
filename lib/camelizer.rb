@@ -5,7 +5,8 @@ class String
         gsub(/\/(.?)/) { "::#{$1.upcase}" }.
         gsub(/(?:^|_)(.)/) { $1.upcase }
     else
-      self[0].chr.downcase + self[1..1].camelize
+      camelized = self.camelize
+      camelized[0].chr.downcase + camelized[1..self.size-1]
     end
   end
 

@@ -62,13 +62,13 @@ namespace <%= name_space %>
 		* <%= func.description %>
 		*
 		<%- func.params.each do |param| -%>
-		* @<%= param.name %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		* @<%= param.name.to_s.camelize(false) %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
 		* @success:<%= successHandler %>
 		* @error:RpcoderErrorHandler
 		*/
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
+			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{

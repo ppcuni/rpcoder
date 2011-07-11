@@ -56,13 +56,13 @@ namespace <%= name_space %>
 		* <%= func.description %>
 		*
 		<%- func.params.each do |param| -%>
-		* @<%= param.name %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		* @<%= param.name.to_s.camelize(false) %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
 		<%- end -%>
 		* @success:<%= successHandler %>
 		* @error:RpcoderErrorHandler
 		*/
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
+			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
@@ -70,7 +70,7 @@ namespace <%= name_space %>
 			<%- if func.is_get? -%>
 			string argsPath = "";
 				<%-
-				request_args = func.query_params.map{|i| "#{i.name}=\" + Uri.EscapeUriString(#{i.name}.ToString())" }
+				request_args = func.query_params.map{|i| "#{i.name}=\" + Uri.EscapeUriString(#{i.name.to_s.camelize(false)}.ToString())" }
 				-%>
 				<%= if func.has_query_params?
 					"argsPath += \"?#{request_args.join(' + "&')};"
@@ -95,7 +95,7 @@ namespace <%= name_space %>
 			JsonData data = new JsonData();
 			
 			<%- func.query_params.each do |i| -%>
-			data["<%= i.name.to_s %>"] = <%= i.name.to_s %>;
+			data["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
 			<%- end -%>
 			foreach(string key in commonParameterList.Keys)
 			{
