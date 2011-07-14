@@ -138,30 +138,36 @@ namespace <%= name_space %>
 				Log("<%= func.name.camelize %> responded " + www.text);
 				try
 				{
-				<%- if func.has_return_type? -%>
 					JsonData jsonData = JsonMapper.ToObject (www.text);
-					<%- end -%>
-					<%-
-						args = []
-						if func.has_return_type?
-							args = func.return_types.map {|param|
-								if param.array?
-									if param.original_type?
-										"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+					HandleDebugMessage(jsonData);
+					try
+					{
+						HandleError(jsonData, error);
+					}
+					catch(KeyNotFoundException)
+					{
+						<%-
+							args = []
+							if func.has_return_type?
+								args = func.return_types.map {|param|
+									if param.array?
+										if param.original_type?
+											"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+										else
+											"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+										end
 									else
-										"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+										if param.original_type?
+											"(#{param.type})jsonData[\"#{param.name}\"]"
+										else
+											"#{param.type}.Create(jsonData[\"#{param.name}\"])"
+										end
 									end
-								else
-									if param.original_type?
-										"(#{param.type})jsonData[\"#{param.name}\"]"
-									else
-										"#{param.type}.Create(jsonData[\"#{param.name}\"])"
-									end
-								end
-							}
-						end
-					-%>
-					success(<%= args.join(', ') %>);
+								}
+							end
+						-%>
+						success(<%= args.join(', ') %>);
+					}
 				}
 				catch(JsonException)
 				{
@@ -171,5 +177,40 @@ namespace <%= name_space %>
 		}
 		
 		<%- end -%>
+
+		private void HandleError(JsonData jsonData, RpcoderErrorHandler error)
+		{
+			JsonData errorJsonData = jsonData["rpcoderError"];
+			string errorType = (string)jsonData["errorType"];
+			string message = null;
+			string targetScene = null;
+			try
+			{
+				message = (string)errorJsonData["message"];
+			}
+			catch(KeyNotFoundException)
+			{
+			}
+			try
+			{
+				targetScene = (string)errorJsonData["targetScene"];
+			}
+			catch(KeyNotFoundException)
+			{
+			}
+			error(errorType, message, targetScene);
+		}
+
+		private void HandleDebugMessage(JsonData jsonData)
+		{
+			try
+			{
+				string message = (string)jsonData["debugMessage"];
+				Log(message);
+			}
+			catch(KeyNotFoundException)
+			{
+			}
+		}
 	}
 }
