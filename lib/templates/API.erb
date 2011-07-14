@@ -142,10 +142,6 @@ namespace <%= name_space %>
 					HandleDebugMessage(jsonData);
 					try
 					{
-						HandleError(jsonData, error);
-					}
-					catch(KeyNotFoundException)
-					{
 						<%-
 							args = []
 							if func.has_return_type?
@@ -167,6 +163,10 @@ namespace <%= name_space %>
 							end
 						-%>
 						success(<%= args.join(', ') %>);
+					}
+					catch(KeyNotFoundException)
+					{
+						HandleError(jsonData, error);
 					}
 				}
 				catch(JsonException)
