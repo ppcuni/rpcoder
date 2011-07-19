@@ -51,17 +51,28 @@ namespace <%= name_space %>
 			try
 			{
 				<%- if field.original_type? -%>
-				<%- if field.array? -%>
+					<%- if field.array? -%>
 				createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(jsonData["<%= field.name.to_s %>"].ToJson());
-				<%- else -%>
+					<%- else -%>
+						<%- if field.double? -%>
+				if(jsonData["<%= field.name.to_s %>"].<%= field.to_json_type? %>)
+				{
+					createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)jsonData["<%= field.name.to_s %>"];
+				}
+				else
+				{
+					createdData.<%= field.name.to_s.camelize %> = (int?)jsonData["<%= field.name.to_s %>"];
+				}
+						<%- else -%>
 				createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)jsonData["<%= field.name.to_s %>"];
-				<%- end -%>
+						<%- end -%>
+					<%- end -%>
 				<%- else -%>
-				<%- if field.array? -%>
+					<%- if field.array? -%>
 				createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.CreateList(jsonData["<%= field.name.to_s %>"]);
-				<%- else -%>
+					<%- else -%>
 				createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.Create(jsonData["<%= field.name.to_s %>"]);
-				<%- end -%>
+					<%- end -%>
 				<%- end -%>
 			}
 			catch(KeyNotFoundException)
@@ -75,11 +86,10 @@ namespace <%= name_space %>
 		
 		public static List<<%= type.name %>> CreateList(JsonData jsonData)
 		{
-			List<JsonData> jsonList = JsonMapper.ToObject<List<JsonData>>(jsonData.ToJson());
 			List<<%= type.name %>> createdList = new List<<%= type.name %>>();
-			foreach(JsonData i in jsonList)
+			for(int i = 0; i < jsonData.Count; ++i)
 			{
-				createdList.Add(<%= type.name %>.Create(i));
+				createdList.Add(<%= type.name %>.Create(jsonData[i]));
 			}
 			
 			return createdList;

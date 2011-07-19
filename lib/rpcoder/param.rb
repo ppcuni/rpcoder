@@ -40,12 +40,27 @@ module RPCoder
       end
     end
 
+    def to_json_type?
+      case type.to_sym
+      when :int
+        return "IsInt"
+      when :Double
+        return "IsDouble"
+      when :String
+        return "IsString"
+      when :Boolean
+        return "IsBoolean"
+      else
+        return type
+      end
+    end
+
     def original_type?
       Param.original_types.include?(type.to_sym)
     end
 
-    def array_param
-      Param.new(name, options[:array_type])
+    def double?
+      type.to_sym == :Double
     end
 
     def instance_creator(elem = 'elem', options = {})
