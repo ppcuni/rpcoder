@@ -74,7 +74,9 @@ namespace <%= name_space %>
 		{
 			if( !HandleError(error) )
 			{
+				<%- if func.has_return_type? -%>
 				ArrayList arguments = GetDummySuccess("<%= func.name.camelize %>");
+				<%- end-%>
 				<%-
 					index = -1
 				-%>
