@@ -87,7 +87,16 @@ namespace <%= name_space %>
 			<%- func.query_params.each do |i| -%>
 			if (<%= i.name.to_s.camelize(false) %> != null)
 			{
+				<%- if i.array? -%>
+				JsonData arrayData = new JsonData();
+				for (int i = 0; i < <%= i.name.to_s.camelize(false) %>.Count; ++i)
+				{
+					arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
+				}
+				args["<%= i.name.to_s %>"] = arrayData;
+				<%- else -%>
 				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+				<%- end -%>
 			}
 			<%- end -%>
 			foreach(string key in args.Keys)
@@ -112,7 +121,16 @@ namespace <%= name_space %>
 			<%- func.query_params.each do |i| -%>
 			if (<%= i.name.to_s.camelize(false) %> != null)
 			{
+				<%- if i.array? -%>
+				JsonData arrayData = new JsonData();
+				for (int i = 0; i < <%= i.name.to_s.camelize(false) %>.Count; ++i)
+				{
+					arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
+				}
+				data["<%= i.name.to_s %>"] = arrayData;
+				<%- else -%>
 				data["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+				<%- end -%>
 			}
 			<%- end -%>
 			<%- end -%>
