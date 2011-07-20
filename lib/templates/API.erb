@@ -75,7 +75,7 @@ namespace <%= name_space %>
 		* @error:RpcoderErrorHandler
 		*/
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
+			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error = null']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
@@ -147,6 +147,11 @@ namespace <%= name_space %>
 			<%- end -%>
 			yield return www;
 
+			if(error == null)
+			{
+				error = ErrorHandler;
+			}
+
 			if(www.error != null)
 			{
 				error(RESTART, DefaultErrorMessage + www.error, null);
@@ -198,25 +203,32 @@ namespace <%= name_space %>
 
 		private void HandleError(JsonData jsonData, RpcoderErrorHandler error)
 		{
-			JsonData errorJsonData = jsonData["rpcoderError"];
-			string errorType = (string)jsonData["errorType"];
-			string message = null;
-			string targetScene = null;
 			try
 			{
-				message = (string)errorJsonData["message"];
+				JsonData errorJsonData = jsonData["rpcoderError"];
+				string errorType = (string)jsonData["errorType"];
+				string message = null;
+				string targetScene = null;
+				try
+				{
+					message = (string)errorJsonData["message"];
+				}
+				catch(KeyNotFoundException)
+				{
+				}
+				try
+				{
+					targetScene = (string)errorJsonData["targetScene"];
+				}
+				catch(KeyNotFoundException)
+				{
+				}
+				error(errorType, message, targetScene);
 			}
 			catch(KeyNotFoundException)
 			{
+				error(RESTART, "Json parse Error", null);
 			}
-			try
-			{
-				targetScene = (string)errorJsonData["targetScene"];
-			}
-			catch(KeyNotFoundException)
-			{
-			}
-			error(errorType, message, targetScene);
 		}
 
 		private void HandleDebugMessage(JsonData jsonData)
