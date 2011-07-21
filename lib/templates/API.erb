@@ -75,7 +75,7 @@ namespace <%= name_space %>
 		* @error:RpcoderErrorHandler
 		*/
 		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error = null']
+			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
