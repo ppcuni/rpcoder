@@ -57,7 +57,22 @@ namespace <%= name_space %>
 		<%- functions.each do |func| -%>
 		<%-
 			successHandler = func.name.camelize + "Responder"
+			params_excluded_error_handler = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
+			params = params_excluded_error_handler + ['RpcoderErrorHandler error']
 		-%>
+		/**
+		* <%= func.description %>
+		*
+		<%- func.params.each do |param| -%>
+		* @<%= param.name.to_s.camelize(false) %>:<%= param.type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		<%- end -%>
+		* @success:<%= successHandler %>
+		*/
+		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)
+		{
+			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null);
+		}
+
 		/**
 		* <%= func.description %>
 		*
@@ -67,9 +82,6 @@ namespace <%= name_space %>
 		* @success:<%= successHandler %>
 		* @error:RpcoderErrorHandler
 		*/
-		<%-
-			params = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success', 'RpcoderErrorHandler error']
-		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
 			if( !HandleError(error) )
