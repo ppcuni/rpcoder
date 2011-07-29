@@ -218,7 +218,7 @@ namespace <%= name_space %>
 			try
 			{
 				JsonData errorJsonData = jsonData["rpcoderError"];
-				string errorType = (string)jsonData["errorType"];
+				string errorType = (string)errorJsonData["errorType"];
 				string message = null;
 				string targetScene = null;
 				try
