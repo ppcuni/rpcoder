@@ -48,35 +48,37 @@ namespace <%= name_space %>
 			<%= type.name %> createdData = new <%= type.name %>();
 			
 			<%- type.fields.each do |field| -%>
-			try
 			{
+				JsonData temp;
+				if(jsonData.TryGetValue("<%= field.name.to_s %>", out temp))
+				{
 				<%- if field.original_type? -%>
 					<%- if field.array? -%>
-				createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(jsonData["<%= field.name.to_s %>"].ToJson());
+					createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(temp.ToJson());
 					<%- else -%>
 						<%- if field.double? -%>
-				if(jsonData["<%= field.name.to_s %>"].<%= field.to_json_type? %>)
-				{
-					createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)jsonData["<%= field.name.to_s %>"];
-				}
-				else
-				{
-					createdData.<%= field.name.to_s.camelize %> = (int?)jsonData["<%= field.name.to_s %>"];
-				}
+					if(temp.<%= field.to_json_type? %>)
+					{
+						createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
+					}
+					else
+					{
+						createdData.<%= field.name.to_s.camelize %> = (int?)temp;
+					}
 						<%- else -%>
-				createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)jsonData["<%= field.name.to_s %>"];
+					createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
 						<%- end -%>
 					<%- end -%>
 				<%- else -%>
 					<%- if field.array? -%>
-				createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.CreateList(jsonData["<%= field.name.to_s %>"]);
+					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.CreateList(temp);
 					<%- else -%>
-				createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.Create(jsonData["<%= field.name.to_s %>"]);
+					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.Create(temp);
 					<%- end -%>
 				<%- end -%>
-			}
-			catch(KeyNotFoundException)
-			{
+				}
+				else
+					createdData.<%= field.name.to_s.camelize %> = null;
 			}
 			
 			<%- end -%>
