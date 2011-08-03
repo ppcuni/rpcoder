@@ -45,6 +45,7 @@ namespace <%= name_space %>
 		
 		public static <%= type.name %> Create(JsonData jsonData)
 		{
+			if(jsonData == null) return null;
 			<%= type.name %> createdData = new <%= type.name %>();
 			
 			<%- type.fields.each do |field| -%>
@@ -88,6 +89,7 @@ namespace <%= name_space %>
 		
 		public static List<<%= type.name %>> CreateList(JsonData jsonData)
 		{
+			if(jsonData == null) return null;
 			List<<%= type.name %>> createdList = new List<<%= type.name %>>();
 			for(int i = 0; i < jsonData.Count; ++i)
 			{

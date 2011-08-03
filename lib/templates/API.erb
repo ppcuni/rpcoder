@@ -183,13 +183,13 @@ namespace <%= name_space %>
 								args = func.return_types.map {|param|
 									if param.array?
 										if param.original_type?
-											"JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson())"
+											"jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
 										else
 											"#{param.type}.CreateList(jsonData[\"#{param.name}\"])"
 										end
 									else
 										if param.original_type?
-											"(#{param.type})jsonData[\"#{param.name}\"]"
+											"(#{param.type})jsonData.TryGetValue(\"#{param.name}\")"
 										else
 											"#{param.type}.Create(jsonData[\"#{param.name}\"])"
 										end
@@ -197,7 +197,7 @@ namespace <%= name_space %>
 								}
 							end
 						-%>
-						success(<%= args.join(', ') %>);
+						success(<%= args.join(",\n\t\t\t\t\t\t\t") %>);
 					}
 					catch(KeyNotFoundException)
 					{
