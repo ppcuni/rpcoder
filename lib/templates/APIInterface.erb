@@ -46,7 +46,7 @@ namespace <%= name_space %>
 	public class <%= func.name.camelize + "Response" %>
 	{
 		<%- func.return_types.each do |i| -%>
-		public <%= i.array_or_type %> <%= i.name.to_s.camelize %> { get; set; }
+		public <%= i.array_or_type %> <%= i.name.to_s.camelize %>;
 		<%- end -%>
 	}
 
