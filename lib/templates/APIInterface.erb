@@ -2,18 +2,13 @@
 
 namespace <%= name_space %>
 {
+	using System;
 	using System.Collections;
 	using System.Collections.Generic;
 
 	public delegate void RpcoderLogger(string log);
 	public delegate void RpcoderErrorHandler(string errorType, string message, string targetScene);
-	<%- functions.each do |func| -%>
-	<%-
-		successHandler = func.name.camelize + "Responder"
-	-%>
-	public delegate void <%= successHandler %>(<%= func.return_types.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') }.join(', ') %>);
-	<%- end -%>
-	
+
 	public interface <%= api_class_name %>Interface
 	{
 		string BaseUrl { get; }
@@ -24,31 +19,36 @@ namespace <%= name_space %>
 		
 		<%- functions.each do |func| -%>
 		<%-
-			successHandler = func.name.camelize + "Responder"
+			successHandler = "Action<" + func.name.camelize + "Response>"
 			params_excluded_error_handler = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
 			params = params_excluded_error_handler + ['RpcoderErrorHandler error']
 		-%>
-		/**
-		* <%= func.description %>
-		*
+		/// <summary>
+		/// <%= func.description %>
+		/// </summary>
 		<%- func.params.each do |param| -%>
-		* @<%= param.name.to_s.camelize(false) %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		* @success:<%= successHandler %>
-		*/
 		IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>);
 
-		/**
-		* <%= func.description %>
-		*
+		/// <summary>
+		/// <%= func.description %>
+		/// </summary>
 		<%- func.params.each do |param| -%>
-		* @<%= param.name.to_s.camelize(false) %>:<%= param.array_or_type %> <%= param.options[:expect] %> <%= param.options[:description] %>
+		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		* @success:<%= successHandler %>
-		* @error:RpcoderErrorHandler
-		*/
 		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>);
 		
 		<%- end -%>
 	}
+
+	<%- functions.each do |func| -%>
+	public class <%= func.name.camelize + "Response" %>
+	{
+		<%- func.return_types.each do |i| -%>
+		public <%= i.array_or_type %> <%= i.name.to_s.camelize %> { get; set; }
+		<%- end -%>
+	}
+
+	<%- end -%>
 }
