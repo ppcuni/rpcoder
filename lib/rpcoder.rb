@@ -54,6 +54,7 @@ module RPCoder
         {:path => File.join(class_dir, api_class_name.split('.').last + "Interface.cs"), :content => render_functions_interface},
         {:path => File.join(class_dir, api_class_name.split('.').last + ".cs"), :content => render_functions},
         {:path => File.join(class_dir, api_class_name.split('.').last + "Dummy.cs"), :content => render_functions_dummy},
+        {:path => File.join(class_dir, api_class_name.split('.').last + "DummyServer.cs"), :content => render_functions_dummy_server},
       ].each do |hash|
         puts "API: #{hash[:path]}"
         File.open(hash[:path], "w") { |file| file << hash[:content] }
@@ -71,6 +72,10 @@ module RPCoder
 
     def render_functions_dummy
       render_erb('APIDummy.erb', binding)
+    end
+
+    def render_functions_dummy_server
+      render_erb('APIDummyServer.erb', binding)
     end
 
     def export_type(type, path)

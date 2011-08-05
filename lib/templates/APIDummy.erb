@@ -5,20 +5,6 @@ using System.Collections.Generic;
 
 namespace <%= name_space %>
 {
-	public class DummyError
-	{
-		public string ErrorType { get; set; }
-		public string Message { get; set; }
-		public string TargetScene { get; set; }
-		
-		public DummyError(string errorType, string message, string targetScene)
-		{
-			ErrorType = errorType;
-			Message = message;
-			TargetScene = targetScene;
-		}
-	}
-
 	public class <%= api_class_name %>Dummy : <%= api_class_name %>Interface
 	{
 		public RpcoderErrorHandler ErrorHandler { get; set; }
@@ -32,7 +18,7 @@ namespace <%= name_space %>
 			return "";
 		}
 
-		private DummyError error = null;
+		private RpcoderError error = null;
 		
 		private Dictionary<string, ArrayList> dummySuccess = new Dictionary<string, ArrayList>();
 
@@ -46,7 +32,7 @@ namespace <%= name_space %>
 			return dummySuccess[functionName];
 		}
 
-		public void SetDummyError(DummyError error)
+		public void SetDummyError(RpcoderError error)
 		{
 			this.error = error;
 		}
