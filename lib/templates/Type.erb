@@ -5,7 +5,7 @@ namespace <%= name_space %>
 	using System.Collections.Generic;
 	using LitJson;
 	
-	public class <%= type.name %>
+	public partial class <%= type.name %>
 	{
 		<%- type.fields.each do |field| -%>
 		public <%= field.array_or_type %> <%= field.name.to_s.camelize %> { get; set; }
