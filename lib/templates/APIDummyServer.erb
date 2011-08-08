@@ -56,8 +56,8 @@ namespace <%= name_space %>
 			public <%= successHandler %> Success;
 			public RpcoderErrorHandler Error;
 		}
-		private readonly DummyLogic<<%= func.name.camelize %>Request> <%= func.name.camelize(false) %>Logic = new DummyLogic<<%= func.name.camelize %>Request>();
-		public IDummyLogic<<%= func.name.camelize %>Request> <%= func.name.camelize %>Logic { get { return <%= func.name.camelize(false) %>Logic; } }
+
+		public Func<<%= func.name.camelize %>Request, IEnumerator> <%= func.name.camelize %>Logic { get; set; }
 
 		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)
 		{
@@ -66,9 +66,9 @@ namespace <%= name_space %>
 
 		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
 		{
-			if(<%= func.name.camelize(false) %>Logic.HasLogic)
+			if(<%= func.name.camelize %>Logic != null)
 			{
-				return <%= func.name.camelize(false) %>Logic.Request(new <%= func.name.camelize %>Request(){
+				return <%= func.name.camelize %>Logic(new <%= func.name.camelize %>Request(){
 				<%- func.params.each do |i| -%>
 					<%= i.name.to_s.camelize %> = <%= i.name.to_s.camelize(false) %>,
 				<%- end -%>
@@ -89,56 +89,5 @@ namespace <%= name_space %>
 		}
 
 		<%- end -%>
-	}
-
-	/// <summary cref="DummyLogic{TArg}">
-	/// </summary>
-	public interface IDummyLogic<TArg>
-	{
-		/// <summary>
-		/// ダミーロジック設定。
-		/// </summary>
-		/// <param name="callback">リクエストを受け取るコールバック。</param>
-		void Set(Func<TArg, IEnumerator> callback);
-
-		/// <summary>
-		/// ダミーロジック解除。
-		/// </summary>
-		void Clear();
-
-		/// <summary>
-		/// ダミーロジックがあるかどうか。
-		/// </summary>
-		bool HasLogic { get; }
-	}
-
-	/// <summary>
-	/// ダミーサーバーの処理を注入するためのクラス
-	/// </summary>
-	/// <typeparam name="TArg">リクエストの型。</typeparam>
-	public class DummyLogic<TArg> : IDummyLogic<TArg>
-	{
-		private Func<TArg, IEnumerator> _callback;
-
-		public void Set(Func<TArg, IEnumerator> callback) { _callback = callback; }
-
-		public void Clear() { _callback = null; }
-
-		public bool HasLogic
-		{
-			get
-			{
-				return _callback != null;
-			}
-		}
-
-		/// <summary>
-		/// リクエスト発生。
-		/// </summary>
-		/// <param name="arg">リクエスト。</param>
-		public IEnumerator Request(TArg request)
-		{
-			return _callback(request);
-		}
 	}
 }
