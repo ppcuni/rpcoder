@@ -173,10 +173,6 @@ namespace <%= name_space %>
 					HandleDebugMessage(jsonData);
 					try
 					{
-						HandleError(jsonData, error);
-					}
-					catch(KeyNotFoundException)
-					{
 						<%-
 							args = []
 							if func.has_return_type?
@@ -199,6 +195,17 @@ namespace <%= name_space %>
 						-%>
 						success(new <%= response %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>});
 					}
+					catch(KeyNotFoundException)
+					{
+						try
+						{
+							HandleError(jsonData, error);
+						}
+						catch(KeyNotFoundException)
+						{
+							error(RESTART, "Json parse Error", null);
+						}
+					}
 				}
 				catch(JsonException)
 				{
@@ -214,33 +221,26 @@ namespace <%= name_space %>
 			JsonData errorJsonData = jsonData["rpcoderError"];
 			string errorType = (string)errorJsonData["errorType"];
 			string message = null;
+			JsonData messageJson;
+			if(jsonData.TryGetValue("message", out messageJson))
+			{
+				message = (string)messageJson;
+			}
+			JsonData targetSceneJson;
 			string targetScene = null;
-			try
+			if(jsonData.TryGetValue("message", out targetSceneJson))
 			{
-				message = (string)errorJsonData["message"];
-			}
-			catch(KeyNotFoundException)
-			{
-			}
-			try
-			{
-				targetScene = (string)errorJsonData["targetScene"];
-			}
-			catch(KeyNotFoundException)
-			{
+				targetScene = (string)targetSceneJson;
 			}
 			error(errorType, message, targetScene);
 		}
 
 		private void HandleDebugMessage(JsonData jsonData)
 		{
-			try
+			JsonData message;
+			if(jsonData.TryGetValue("debugMessage", out message))
 			{
-				string message = (string)jsonData["debugMessage"];
-				Log(message);
-			}
-			catch(KeyNotFoundException)
-			{
+				Log((string)message);
 			}
 		}
 	}
