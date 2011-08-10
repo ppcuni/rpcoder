@@ -185,7 +185,7 @@ namespace <%= name_space %>
 										end
 									else
 										if param.original_type?
-											param.name.to_s.camelize + " = (#{param.type})jsonData.TryGetValue(\"#{param.name}\")"
+											param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.TryGetValue(\"#{param.name}\")"
 										else
 											param.name.to_s.camelize + " = #{param.type}.Create(jsonData[\"#{param.name}\"])"
 										end
