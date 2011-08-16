@@ -101,7 +101,7 @@ namespace <%= name_space %>
 				{
 					arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
 				}
-				args["<%= i.name.to_s %>"] = arrayData;
+				args["<%= i.name.to_s %>"] = arrayData.ToJson();
 				<%- else -%>
 				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
 				<%- end -%>
@@ -110,14 +110,14 @@ namespace <%= name_space %>
 			foreach(string key in args.Keys)
 			{
 				argsPath = AddQueryDelimiter(argsPath);
-				argsPath += Uri.EscapeUriString(key) + "=" +  Uri.EscapeUriString(args[key].ToString());
+				argsPath += WWW.EscapeURL(key) + "=" +  WWW.EscapeURL(args[key].ToString());
 			}
 			<%- end -%>
 			
 			foreach(string key in commonParameterList.Keys)
 			{
 				argsPath = AddQueryDelimiter(argsPath);
-				argsPath += Uri.EscapeUriString(key) + "=" + Uri.EscapeUriString(commonParameterList[key]);
+				argsPath += WWW.EscapeURL(key) + "=" + WWW.EscapeURL(commonParameterList[key]);
 			}
 			string fullPath = this.BaseUrl + path + argsPath;
 			Log("request " + fullPath);
