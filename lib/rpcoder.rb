@@ -6,6 +6,9 @@ require 'rpcoder/type'
 
 module RPCoder
   class << self
+    @@templates = ["API", "Interface", "Dummy", "DummyServer"]
+    @@extra_templates = []
+
     def name_space=(name_space)
       @name_space = name_space
     end
@@ -46,36 +49,37 @@ module RPCoder
       func
     end
 
+    def add_template(item_name, template_path)
+      @@extra_templates << {:path => item_name, :template => template_path}
+    end
+
+    def create_binding(name)
+      {:path => name, :template => template_path(name) }
+    end
+
+    def get_export_file_name(class_dir, name)
+      File.join(class_dir, api_class_name.split('.').last + name + ".cs")
+    end
+
+    def render_erb(template, _binding)
+      ERB.new(File.read(template), nil, '-').result(_binding)
+    end
+
+    def template_path(name)
+      File.join File.dirname(__FILE__), 'templates', name + '.erb'
+    end
+
     def export(dir)
       class_dir = dir_to_export_classes(dir)
       FileUtils.mkdir_p(class_dir)
-
-      [
-        {:path => File.join(class_dir, api_class_name.split('.').last + "Interface.cs"), :content => render_functions_interface},
-        {:path => File.join(class_dir, api_class_name.split('.').last + ".cs"), :content => render_functions},
-        {:path => File.join(class_dir, api_class_name.split('.').last + "Dummy.cs"), :content => render_functions_dummy},
-        {:path => File.join(class_dir, api_class_name.split('.').last + "DummyServer.cs"), :content => render_functions_dummy_server},
-      ].each do |hash|
-        puts "API: #{hash[:path]}"
-        File.open(hash[:path], "w") { |file| file << hash[:content] }
+      @@templates.map { |name|
+        create_binding(name)
+      }.concat(@@extra_templates).each do |hash|
+        path = get_export_file_name(class_dir, hash[:path])
+        puts "API: #{path}"
+        File.open(path, "w") { |file| file << render_erb(hash[:template], binding) }
       end
       types.each { |type| export_type(type, File.join(class_dir, "#{type.name}.cs")) }
-    end
-
-    def render_functions_interface
-      render_erb('APIInterface.erb', binding)
-    end
-
-    def render_functions
-      render_erb('API.erb', binding)
-    end
-
-    def render_functions_dummy
-      render_erb('APIDummy.erb', binding)
-    end
-
-    def render_functions_dummy_server
-      render_erb('APIDummyServer.erb', binding)
     end
 
     def export_type(type, path)
@@ -84,15 +88,7 @@ module RPCoder
     end
 
     def render_type(type)
-      render_erb('Type.erb', binding)
-    end
-
-    def render_erb(template, _binding)
-      ERB.new(File.read(template_path(template)), nil, '-').result(_binding)
-    end
-
-    def template_path(name)
-      File.join File.dirname(__FILE__), 'templates', name
+      render_erb(template_path('Type'), binding)
     end
 
     def dir_to_export_classes(dir)
