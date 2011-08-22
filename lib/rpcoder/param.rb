@@ -3,7 +3,7 @@ require 'camelizer'
 module RPCoder
   class Param
     def self.original_types
-      [:int, :Double, :String, :Boolean, :Array]
+      [:int, :Int, :double, :Double, :string, :String, :bool, :Boolean, :Array]
     end
 
     attr_accessor :name, :type, :options
@@ -29,10 +29,18 @@ module RPCoder
       case type.to_sym
       when :int
         return :int?
+      when :Int
+        return :int?
+      when :double
+        return :double?
       when :Double
         return :double?
+      when :string
+        return :string
       when :String
         return :string
+      when :bool
+        return :bool?
       when :Boolean
         return :bool?
       else
@@ -44,10 +52,18 @@ module RPCoder
       case type.to_sym
       when :int
         return "IsInt"
+      when :Int
+        return "IsInt"
+      when :double
+        return "IsDouble"
       when :Double
         return "IsDouble"
+      when :string
+        return "IsString"
       when :String
         return "IsString"
+      when :bool
+        return "IsBoolean"
       when :Boolean
         return "IsBoolean"
       else
