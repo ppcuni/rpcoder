@@ -209,7 +209,7 @@ namespace <%= name_space %>
 				}
 				catch(JsonException)
 				{
-					error(RESTART, "Json parse Error", null);
+					error(RESTART, "Json parse Error\n" + www.text, null);
 				}
 			}
 		}
