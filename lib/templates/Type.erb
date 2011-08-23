@@ -64,7 +64,7 @@ namespace <%= name_space %>
 					}
 					else
 					{
-						createdData.<%= field.name.to_s.camelize %> = (int?)temp;
+						createdData.<%= field.name.to_s.camelize %> = <%- if field.optional? -%>(int?)<%- else -%>(int)<%- end -%>temp;
 					}
 						<%- else -%>
 					createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
@@ -78,8 +78,10 @@ namespace <%= name_space %>
 					<%- end -%>
 				<%- end -%>
 				}
+				<%- if field.optional? -%>
 				else
 					createdData.<%= field.name.to_s.camelize %> = null;
+				<%- end -%>
 			}
 			
 			<%- end -%>

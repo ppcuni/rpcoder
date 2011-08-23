@@ -93,7 +93,9 @@ namespace <%= name_space %>
 			<%- if func.has_query_params? -%>
 			Dictionary<string, System.Object> args = new Dictionary<string, System.Object>();
 			<%- func.query_params.each do |i| -%>
+			<%- if i.optional? -%>
 			if (<%= i.name.to_s.camelize(false) %> != null)
+			<%- end -%>
 			{
 				<%- if i.array? -%>
 				JsonData arrayData = new JsonData();
@@ -127,7 +129,9 @@ namespace <%= name_space %>
 			
 			<%- if func.has_query_params? -%>
 			<%- func.query_params.each do |i| -%>
+			<%- if i.optional? -%>
 			if (<%= i.name.to_s.camelize(false) %> != null)
+			<%- end -%>
 			{
 				<%- if i.array? -%>
 				JsonData arrayData = new JsonData();

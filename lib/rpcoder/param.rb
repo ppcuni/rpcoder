@@ -17,6 +17,10 @@ module RPCoder
       options[:array?]
     end
 
+    def optional?
+      options[:require] == false
+    end
+
     def array_or_type
       if array?
         "List<#{to_c_sharp_type}>"
@@ -28,21 +32,45 @@ module RPCoder
     def to_c_sharp_type
       case type.to_sym
       when :int
-        return :int?
+        if self.optional?
+          return :int?
+        else
+          return :int
+        end
       when :Int
-        return :int?
+        if self.optional?
+          return :int?
+        else
+          return :int
+        end
       when :double
-        return :double?
+        if self.optional?
+          return :double?
+        else
+          return :double
+        end
       when :Double
-        return :double?
+        if self.optional?
+          return :double?
+        else
+          return :double
+        end
       when :string
         return :string
       when :String
         return :string
       when :bool
-        return :bool?
+        if self.optional?
+          return :bool?
+        else
+          return :bool
+        end
       when :Boolean
-        return :bool?
+        if self.optional?
+          return :bool?
+        else
+          return :bool
+        end
       else
         return type
       end
@@ -76,7 +104,7 @@ module RPCoder
     end
 
     def double?
-      type.to_sym == :Double
+      self.to_json_type? == "IsDouble"
     end
 
     def instance_creator(elem = 'elem', options = {})
