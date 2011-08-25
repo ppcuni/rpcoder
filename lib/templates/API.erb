@@ -152,7 +152,8 @@ namespace <%= name_space %>
 				data[key] = commonParameterList[key];
 			}
 			
-			byte[] byteArray = Encoding.UTF8.GetBytes(data.ToJson());
+			var json = data.ToJson();
+			byte[] byteArray = Encoding.UTF8.GetBytes(json == String.Empty ? " " : json);
 			Log("request " + this.BaseUrl + path + " " + data.ToJson());
 			
 			WWW www = new WWW(this.BaseUrl + path, byteArray);
