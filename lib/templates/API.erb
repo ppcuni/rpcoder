@@ -14,7 +14,7 @@ namespace <%= name_space %>
 		public const string RETENTION	= "RETENTION";
 		public const string TRANSITION	= "TRANSITION";
 		
-		public string BaseUrl { get; protected set; }
+		public string BaseUrl { get; set; }
 		public RpcoderLogger Logger { get; set; } 
 		private void Log(string log)
 		{
