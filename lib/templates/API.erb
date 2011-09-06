@@ -225,7 +225,7 @@ namespace <%= name_space %>
 		{
 			JsonData errorJsonData = jsonData["rpcoderError"];
 			string errorType = (string)errorJsonData["errorType"];
-			string message = null;
+			string message = "";
 			JsonData messageJson;
 			if(jsonData.TryGetValue("message", out messageJson))
 			{
