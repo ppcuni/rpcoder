@@ -227,13 +227,13 @@ namespace <%= name_space %>
 			string errorType = (string)errorJsonData["errorType"];
 			string message = "";
 			JsonData messageJson;
-			if(jsonData.TryGetValue("message", out messageJson))
+			if(errorJsonData.TryGetValue("message", out messageJson))
 			{
 				message = (string)messageJson;
 			}
 			JsonData targetSceneJson;
 			string targetScene = null;
-			if(jsonData.TryGetValue("message", out targetSceneJson))
+			if(errorJsonData.TryGetValue("targetScene", out targetSceneJson))
 			{
 				targetScene = (string)targetSceneJson;
 			}
