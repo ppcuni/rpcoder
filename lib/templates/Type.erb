@@ -3,7 +3,6 @@
 namespace <%= name_space %>
 {
 	using System.Collections.Generic;
-	using LitJson;
 	
 	public partial class <%= type.name %>
 	{
@@ -18,87 +17,6 @@ namespace <%= name_space %>
 			<%- type.fields.each do |field| -%>
 			this.<%= field.name.to_s.camelize %> = <%= field.name.to_s.camelize(false) %>;
 			<%- end -%>
-		}
-
-		public override string ToString()
-		{
-			<%- type.fields.each do |field| -%>
-			<%- if field.array? -%>
-			<%-
-				list_name = field.name.to_s + "ListString"
-			-%>
-			string <%= list_name %> = "[";
-			if(<%= field.name.to_s.camelize %> != null)
-			{
-				foreach(<%= field.to_c_sharp_type %> i in <%= field.name.to_s.camelize %>)
-				{
-					<%= list_name %> += i + ", ";
-				}
-			}
-			<%= list_name %> += "]";
-			<%- end -%>
-			<%- end -%>
-			
-			string[] strResult = {<%= type.fields.map {|i| "\"#{i.name.to_s.camelize}:\" + #{unless i.array? then i.name.to_s.camelize else i.name.to_s + 'ListString' end}" }.join(', ') %>};
-			return string.Join(", ", strResult);
-		}
-		
-		public static <%= type.name %> Create(JsonData jsonData)
-		{
-			if(jsonData == null) return null;
-			<%= type.name %> createdData = new <%= type.name %>();
-			
-			<%- type.fields.each do |field| -%>
-			{
-				JsonData temp;
-				if(jsonData.TryGetValue("<%= field.name.to_s %>", out temp))
-				{
-				<%- if field.original_type? -%>
-					<%- if field.array? -%>
-					createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(temp.ToJson());
-					<%- else -%>
-						<%- if field.double? -%>
-					if(temp.<%= field.to_json_type? %>)
-					{
-						createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
-					}
-					else
-					{
-						createdData.<%= field.name.to_s.camelize %> = <%- if field.optional? -%>(int?)<%- else -%>(int)<%- end -%>temp;
-					}
-						<%- else -%>
-					createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
-						<%- end -%>
-					<%- end -%>
-				<%- else -%>
-					<%- if field.array? -%>
-					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.CreateList(temp);
-					<%- else -%>
-					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.Create(temp);
-					<%- end -%>
-				<%- end -%>
-				}
-				<%- if field.optional? -%>
-				else
-					createdData.<%= field.name.to_s.camelize %> = null;
-				<%- end -%>
-			}
-			
-			<%- end -%>
-			
-			return createdData;
-		}
-		
-		public static List<<%= type.name %>> CreateList(JsonData jsonData)
-		{
-			if(jsonData == null) return null;
-			List<<%= type.name %>> createdList = new List<<%= type.name %>>();
-			for(int i = 0; i < jsonData.Count; ++i)
-			{
-				createdList.Add(<%= type.name %>.Create(jsonData[i]));
-			}
-			
-			return createdList;
 		}
 	}
 }

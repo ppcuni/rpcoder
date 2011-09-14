@@ -79,16 +79,17 @@ module RPCoder
         puts "API: #{path}"
         File.open(path, "w") { |file| file << render_erb(hash[:template], binding) }
       end
-      types.each { |type| export_type(type, File.join(class_dir, "#{type.name}.cs")) }
+      types.each { |type| export_type(type, 'Type', File.join(class_dir, "#{type.name}.cs")) }
+      types.each { |type| export_type(type, 'TypeJson', File.join(class_dir, "#{type.name}.json.cs")) }
     end
 
-    def export_type(type, path)
+    def export_type(type, template_name, path)
       puts "Type: #{path}"
-      File.open(path, "w") { |file| file << render_type(type) }
+      File.open(path, "w") { |file| file << render_type(type, template_name) }
     end
 
-    def render_type(type)
-      render_erb(template_path('Type'), binding)
+    def render_type(type, template_name)
+      render_erb(template_path(template_name), binding)
     end
 
     def dir_to_export_classes(dir)
