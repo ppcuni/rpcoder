@@ -91,5 +91,10 @@ namespace <%= name_space %>
 		{
 			return Create(LitJson.JsonMapper.ToObject(json));
 		}
+
+		public static List<<%= type.name %>> ParseList(string json)
+		{
+			return CreateList(LitJson.JsonMapper.ToObject(json));
+		}
 	}
 }
