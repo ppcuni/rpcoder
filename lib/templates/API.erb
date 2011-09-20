@@ -168,7 +168,7 @@ namespace <%= name_space %>
 
 			if(www.error != null)
 			{
-				error(RESTART, DefaultErrorMessage + www.error, null);
+				error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? www.error : ""), null);
 			}
 			else
 			{

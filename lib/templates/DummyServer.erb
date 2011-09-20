@@ -7,37 +7,57 @@ namespace <%= name_space %>
 {
 	public class <%= api_class_name %>DummyServer : <%= api_class_name %>Interface
 	{
-		public <%= api_class_name %>DummyServer(string baseUrl)
+		public <%= api_class_name %>DummyServer(<%= api_class_name %>Interface api)
 		{
-			BaseUrl = baseUrl;
-			api = new <%= api_class_name %>(baseUrl);
+			_api = api;
 		}
 
-		private <%= api_class_name %> api;
+		private <%= api_class_name %>Interface _api;
 
-		public RpcoderErrorHandler ErrorHandler { get; set; }
+		public RpcoderErrorHandler ErrorHandler
+		{
+			get
+			{
+				return _api.ErrorHandler;
+			}
+			set
+			{
+				_api.ErrorHandler = value;
+			}
+		}
 
-		public string BaseUrl { get; set; }
+		public string BaseUrl
+		{
+			get
+			{
+				return _api.BaseUrl;
+			}
+			set
+			{
+				_api.BaseUrl = value;
+			}
+		}
 
 		public RpcoderLogger Logger
 		{
 			get
 			{
-				return api.Logger;
+				return _api.Logger;
 			}
 			set
 			{
-				api.Logger = value;
+				_api.Logger = value;
 			}
 		}
 
 		public void AddCommonParameter(string key, string value)
 		{
+			_api.AddCommonParameter(key, value);
 		}
 
 		public string RemoveCommonParameter(string key)
 		{
-			return "";
+			return _api.RemoveCommonParameter(key);
 		}
 
 		<%- functions.each do |func| -%>
@@ -78,7 +98,7 @@ namespace <%= name_space %>
 			}
 			else
 			{
-				return api.<%= func.name.camelize %>(
+				return _api.<%= func.name.camelize %>(
 				<%- func.params.each do |i| -%>
 					<%= i.name.to_s.camelize(false) %>,
 				<%- end -%>
