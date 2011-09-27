@@ -20,6 +20,8 @@ namespace <%= name_space %>
 					"\"" + <%= x.name.to_s.camelize %> + "\"",
 				<%- elsif x.array_or_type.to_s == "bool" then  -%>
 					(<%= x.name.to_s.camelize %> ? "true" : "false"),
+				<%- elsif x.optional? -%>
+					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToString() : "null"),
 				<%- else -%>
 					<%= x.name.to_s.camelize %>.ToString(),
 				<%- end -%>
