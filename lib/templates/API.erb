@@ -136,9 +136,18 @@ namespace <%= name_space %>
 			{
 				<%- if i.array? -%>
 				JsonData arrayData = new JsonData();
-				for (int i = 0; i < <%= i.name.to_s.camelize(false) %>.Count; ++i)
+				var count = <%= i.name.to_s.camelize(false) %>.Count;
+				if(count > 0)
 				{
-					arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
+					for (int i = 0; i < count; ++i)
+					{
+						arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
+					}
+				}
+				else
+				{
+					arrayData.Add(0);
+					arrayData.Clear();
 				}
 				data["<%= i.name.to_s %>"] = arrayData;
 				<%- else -%>
