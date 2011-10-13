@@ -177,7 +177,7 @@ namespace <%= name_space %>
 
 			if(www.error != null)
 			{
-				error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? www.error : ""), null);
+				error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + data.ToJson() + "\n" + www.error : ""), null);
 			}
 			else
 			{
