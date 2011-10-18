@@ -231,7 +231,7 @@ namespace <%= name_space %>
 		
 		<%- end -%>
 
-		private void HandleError(JsonData jsonData, RpcoderErrorHandler error)
+		public void HandleError(JsonData jsonData, RpcoderErrorHandler error)
 		{
 			JsonData errorJsonData = jsonData["rpcoderError"];
 			string errorType = (string)errorJsonData["errorType"];
