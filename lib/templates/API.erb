@@ -185,10 +185,10 @@ namespace <%= name_space %>
 				try
 				{
 					JsonData jsonData = JsonMapper.ToObject (www.text);
-					HandleDebugMessage(jsonData);
+					<%= api_class_name %>.HandleDebugMessage(jsonData, Logger);
 					try
 					{
-						HandleError(jsonData, error);
+						<%= api_class_name %>.HandleError(jsonData, error);
 					}
 					catch(KeyNotFoundException)
 					{
@@ -231,7 +231,7 @@ namespace <%= name_space %>
 		
 		<%- end -%>
 
-		public void HandleError(JsonData jsonData, RpcoderErrorHandler error)
+		public static void HandleError(JsonData jsonData, RpcoderErrorHandler error)
 		{
 			JsonData errorJsonData = jsonData["rpcoderError"];
 			string errorType = (string)errorJsonData["errorType"];
@@ -250,12 +250,12 @@ namespace <%= name_space %>
 			error(errorType, message, targetScene);
 		}
 
-		private void HandleDebugMessage(JsonData jsonData)
+		public static void HandleDebugMessage(JsonData jsonData, RpcoderLogger Logger)
 		{
 			JsonData message;
 			if(jsonData.TryGetValue("debugMessage", out message))
 			{
-				Log((string)message);
+				Logger((string)message);
 			}
 		}
 	}
