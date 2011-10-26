@@ -12,7 +12,7 @@ namespace <%= name_space %>
 	public interface <%= api_class_name %>Interface
 	{
 		string BaseUrl { get; set; }
-		RpcoderLogger Logger { get; set; } 
+		RpcoderLogger Logger { get; set; }
 		void AddCommonParameter(string key, string value);
 		string RemoveCommonParameter(string key);
 		RpcoderErrorHandler ErrorHandler{ get; set; }

@@ -22,6 +22,13 @@ namespace <%= name_space %>
 			if(Logger != null) Logger(log);
 		}
 
+		public event Action<JsonData> Responded;
+		private void RaiseResponded(JsonData jsonData)
+		{
+			var d = Responded;
+			if (d != null) d(jsonData);
+		}
+
 		private Dictionary<string, string> commonParameterList = new Dictionary<string, string>();
 
 		public void AddCommonParameter(string key, string value)
@@ -215,6 +222,7 @@ namespace <%= name_space %>
 								end
 							-%>
 							success(new <%= response %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>});
+							RaiseResponded(jsonData);
 						}
 						catch(KeyNotFoundException)
 						{
@@ -250,12 +258,12 @@ namespace <%= name_space %>
 			error(errorType, message, targetScene);
 		}
 
-		public static void HandleDebugMessage(JsonData jsonData, RpcoderLogger Logger)
+		public static void HandleDebugMessage(JsonData jsonData, RpcoderLogger logger)
 		{
 			JsonData message;
 			if(jsonData.TryGetValue("debugMessage", out message))
 			{
-				Logger((string)message);
+				logger((string)message);
 			}
 		}
 	}
