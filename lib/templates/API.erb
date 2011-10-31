@@ -192,7 +192,7 @@ namespace <%= name_space %>
 				try
 				{
 					JsonData jsonData = JsonMapper.ToObject (www.text);
-					<%= api_class_name %>.HandleDebugMessage(jsonData, Logger);
+					<%= api_class_name %>.HandleDebugMessage(jsonData, Log);
 					try
 					{
 						<%= api_class_name %>.HandleError(jsonData, error);
@@ -258,7 +258,7 @@ namespace <%= name_space %>
 			error(errorType, message, targetScene);
 		}
 
-		public static void HandleDebugMessage(JsonData jsonData, RpcoderLogger logger)
+		public static void HandleDebugMessage(JsonData jsonData, Action<string> logger)
 		{
 			JsonData message;
 			if(jsonData.TryGetValue("debugMessage", out message))
