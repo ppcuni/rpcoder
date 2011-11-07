@@ -29,6 +29,20 @@ namespace <%= name_space %>
 			if (d != null) d(jsonData);
 		}
 
+		public Func<string, string> CustomValidator;
+		private string Validate(string source)
+		{
+			var d = CustomValidator;
+			if(d != null)
+			{
+				return CustomValidator(source);
+			}
+			else
+			{
+				return source;
+			}
+		}
+
 		private Dictionary<string, string> commonParameterList = new Dictionary<string, string>();
 
 		public void AddCommonParameter(string key, string value)
@@ -191,7 +205,8 @@ namespace <%= name_space %>
 				Log("<%= func.name.camelize %> responded " + www.text);
 				try
 				{
-					JsonData jsonData = JsonMapper.ToObject (www.text);
+					var text = Validate(www.text);
+					JsonData jsonData = JsonMapper.ToObject(text);
 					<%= api_class_name %>.HandleDebugMessage(jsonData, Log);
 					try
 					{
