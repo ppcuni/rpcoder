@@ -224,13 +224,13 @@ namespace <%= name_space %>
 											if param.original_type?
 												param.name.to_s.camelize + " = jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
 											else
-												param.name.to_s.camelize + " = #{param.type}.CreateList(jsonData[\"#{param.name}\"])"
+												param.name.to_s.camelize + " = #{param.type}.CreateList(jsonData.GetValueOrDefault(\"#{param.name}\"))"
 											end
 										else
 											if param.original_type?
 												param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.GetValueOrDefault(\"#{param.name}\")"
 											else
-												param.name.to_s.camelize + " = #{param.type}.Create(jsonData[\"#{param.name}\"])"
+												param.name.to_s.camelize + " = #{param.type}.Create(jsonData.GetValueOrDefault(\"#{param.name}\"))"
 											end
 										end
 									}
