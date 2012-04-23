@@ -100,7 +100,7 @@ namespace <%= name_space %>
 		<%- end -%>
 		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)
 		{
-			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null);
+			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null, null);
 		}
 
 		/// <summary>
@@ -109,7 +109,7 @@ namespace <%= name_space %>
 		<%- func.params.each do |param| -%>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
+		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, TaskCancellation cancel)
 		{
 			string path = <%= func.path_parts.join(' + ') %>;
 			<%- if func.is_get? -%>
@@ -148,6 +148,7 @@ namespace <%= name_space %>
 			string fullPath = this.BaseUrl + path + argsPath;
 			Log("request " + fullPath);
 			WWW www = new WWW(fullPath);
+			
 			<%- else -%>
 			JsonData data = new JsonData();
 			
@@ -191,6 +192,7 @@ namespace <%= name_space %>
 			
 			WWW www = new WWW(this.BaseUrl + path, byteArray);
 			<%- end -%>
+			cancel.Cancelled += () => { if (www != null) { www.Dispose(); www = null; } };
 			yield return www;
 
 			if(error == null)
@@ -251,6 +253,12 @@ namespace <%= name_space %>
 				{
 					error(RESTART, "Json parse Error\n" + www.text, null);
 				}
+			}
+			
+			if(www != null)
+			{
+				www.Dispose(); 
+				www = null; 
 			}
 		}
 		

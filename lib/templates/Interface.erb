@@ -37,7 +37,7 @@ namespace <%= name_space %>
 		<%- func.params.each do |param| -%>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>);
+		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, TaskCancellation cancel);
 		
 		<%- end -%>
 	}

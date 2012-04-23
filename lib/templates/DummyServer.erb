@@ -81,10 +81,10 @@ namespace <%= name_space %>
 
 		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)
 		{
-			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null);
+			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null,null);
 		}
 
-		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>)
+		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, TaskCancellation cancel)
 		{
 			if(<%= func.name.camelize %>Logic != null)
 			{
@@ -103,7 +103,8 @@ namespace <%= name_space %>
 					<%= i.name.to_s.camelize(false) %>,
 				<%- end -%>
 					success,
-					(error != null) ? error : ErrorHandler
+					(error != null) ? error : ErrorHandler,
+					cancel
 					);
 			}
 		}
