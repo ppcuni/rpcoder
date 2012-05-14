@@ -71,6 +71,7 @@ namespace <%= name_space %>
 			DefaultErrorMessage = "";
 			JsonMapper.RegisterImporter<int, double?>((i) => (double?)i);
 			JsonMapper.RegisterImporter<int, double>((i) => (double)i);
+			JsonMapper.RegisterImporter<int, int?>((i) => (int?)i);
 		}
 
 		private string AddQueryDelimiter(string source)
