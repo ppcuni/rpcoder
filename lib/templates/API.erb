@@ -102,7 +102,7 @@ namespace <%= name_space %>
 		<%- end -%>
 		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)
 		{
-			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null, null);
+			return this.<%= func.name.camelize %>(<%= (func.params.map{|i| i.name.to_s.camelize(false) } + ['success']).join(', ') %>, null, null, null);
 		}
 
 		/// <summary>
@@ -111,178 +111,230 @@ namespace <%= name_space %>
 		<%- func.params.each do |param| -%>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, TaskCancellation cancel)
+		public IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, Action throwIfCancelRequested, Action<float> reportProgress)
 		{
 			string path = <%= func.path_parts.join(' + ') %>;
 			<%- if func.is_get? -%>
-			string argsPath = "";
+			var args = new Dictionary<string, System.Object>();
+			<%- else -%>
+			var args = new JsonData();
+			<%- end -%>
+
 			<%- if func.has_query_params? -%>
-			Dictionary<string, System.Object> args = new Dictionary<string, System.Object>();
 			<%- func.query_params.each do |i| -%>
 			<%- if i.optional? -%>
 			if (<%= i.name.to_s.camelize(false) %> != null)
 			<%- end -%>
 			{
 				<%- if i.array? -%>
-				JsonData arrayData = new JsonData();
-				for (int i = 0; i < <%= i.name.to_s.camelize(false) %>.Count; ++i)
-				{
-					arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
-				}
-				args["<%= i.name.to_s %>"] = arrayData.ToJson();
+				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>);
 				<%- else -%>
 				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
 				<%- end -%>
 			}
 			<%- end -%>
-			foreach(string key in args.Keys)
-			{
-				argsPath = AddQueryDelimiter(argsPath);
-				argsPath += WWW.EscapeURL(key) + "=" +  WWW.EscapeURL(args[key].ToString());
-			}
 			<%- end -%>
-			
-			foreach(string key in commonParameterList.Keys)
-			{
-				argsPath = AddQueryDelimiter(argsPath);
-				argsPath += WWW.EscapeURL(key) + "=" + WWW.EscapeURL(commonParameterList[key]);
-			}
-			string fullPath = this.BaseUrl + path + argsPath;
-			Log("request " + fullPath);
-			WWW www = new WWW(fullPath);
-			
+
+			string text = null;
+			string errorText = null;
+
+			<%- if func.is_get? -%>
+			var w = GetTextFromWww(this.BaseUrl + path, args, throwIfCancelRequested, reportProgress,
+				x => text = x,
+				x => errorText = x);
 			<%- else -%>
-			JsonData data = new JsonData();
-			
-			<%- if func.has_query_params? -%>
-			<%- func.query_params.each do |i| -%>
-			<%- if i.optional? -%>
-			if (<%= i.name.to_s.camelize(false) %> != null)
-			<%- end -%>
-			{
-				<%- if i.array? -%>
-				JsonData arrayData = new JsonData();
-				var count = <%= i.name.to_s.camelize(false) %>.Count;
-				if(count > 0)
-				{
-					for (int i = 0; i < count; ++i)
-					{
-						arrayData.Add(<%= i.name.to_s.camelize(false) %>[i]);
-					}
-				}
-				else
-				{
-					arrayData.Add(0);
-					arrayData.Clear();
-				}
-				data["<%= i.name.to_s %>"] = arrayData;
-				<%- else -%>
-				data["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
-				<%- end -%>
-			}
-			<%- end -%>
+			var w = PostTextFromWww(this.BaseUrl + path, args, throwIfCancelRequested, reportProgress,
+				x => text = x,
+				x => errorText = x);
 			<%- end -%>
 
-			foreach(string key in commonParameterList.Keys)
-			{
-				data[key] = commonParameterList[key];
-			}
-			
-			var json = data.ToJson();
-			byte[] byteArray = Encoding.UTF8.GetBytes(json == String.Empty ? " " : json);
-			Log("request " + this.BaseUrl + path + " " + data.ToJson());
-			
-			WWW www = new WWW(this.BaseUrl + path, byteArray);
-			<%- end -%>
-			cancel.Cancelled += () => { if (www != null) { www.Dispose(); www = null; } };
-			yield return www;
+			foreach (var x in w) yield return x;
 
-			if(error == null)
+			if (error == null)
 			{
 				error = ErrorHandler;
 			}
 
-			if(www.error != null)
+			if (errorText != null)
 			{
-				error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + data.ToJson() + "\n" + www.error : ""), null);
+				<%- if func.is_get? -%>
+					error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + "\n" + errorText : ""), null);
+				<%- else -%>
+					error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + args.ToJson() + "\n" + errorText : ""), null);
+				<%- end -%>
 			}
 			else
 			{
-				Log("<%= func.name.camelize %> responded " + www.text);
-				try
-				{
-					var text = Validate(www.text);
-					JsonData jsonData = JsonMapper.ToObject(text);
-					<%= api_class_name %>.HandleDebugMessage(jsonData, Log);
-					try
-					{
-						<%= api_class_name %>.HandleError(jsonData, error);
-					}
-					catch(KeyNotFoundException)
-					{
-						try
-						{
-							<%-
-								args = []
-								if func.has_return_type?
-									args = func.return_types.map {|param|
-										if param.array?
-											if param.original_type?
-												param.name.to_s.camelize + " = jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
-											else
-												param.name.to_s.camelize + " = #{param.type}.CreateList(jsonData.GetValueOrDefault(\"#{param.name}\"))"
-											end
-										else
-											if param.original_type?
-												param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.GetValueOrDefault(\"#{param.name}\")"
-											else
-												param.name.to_s.camelize + " = #{param.type}.Create(jsonData.GetValueOrDefault(\"#{param.name}\"))"
-											end
-										end
-									}
+				<%-
+					args = []
+					if func.has_return_type?
+						args = func.return_types.map {|param|
+							if param.array?
+								if param.original_type?
+									param.name.to_s.camelize + " = jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
+								else
+									param.name.to_s.camelize + " = #{param.type}.CreateList(jsonData.GetValueOrDefault(\"#{param.name}\"))"
 								end
-							-%>
-							success(new <%= response %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>});
-							RaiseResponded(jsonData);
+							else
+								if param.original_type?
+									param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.GetValueOrDefault(\"#{param.name}\")"
+								else
+									param.name.to_s.camelize + " = #{param.type}.Create(jsonData.GetValueOrDefault(\"#{param.name}\"))"
+								end
+							end
 						}
-						catch(KeyNotFoundException)
-						{
-							error(RESTART, "Json parse Error", null);
-						}
-					}
-				}
-				catch(JsonException)
-				{
-					error(RESTART, "Json parse Error\n" + www.text, null);
-				}
-			}
-			
-			if(www != null)
-			{
-				www.Dispose(); 
-				www = null; 
+					end
+				-%>
+				ParseResponse("<%= func.name.camelize %>", text,
+					jsonData => new <%= response %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>},
+					success,
+					error);
 			}
 		}
 		
 		<%- end -%>
 
-		public static void HandleError(JsonData jsonData, RpcoderErrorHandler error)
+		private static JsonData ToJson<T>(List<T> list)
 		{
-			JsonData errorJsonData = jsonData["rpcoderError"];
-			string errorType = (string)errorJsonData["errorType"];
+			JsonData arrayData = new JsonData();
+			var count = list.Count;
+			if (count > 0)
+			{
+				for (int i = 0; i < count; ++i)
+				{
+					arrayData.Add(list[i]);
+				}
+			}
+			else
+			{
+				arrayData.Add(0);
+				arrayData.Clear();
+			}
+			return arrayData;
+		}
+
+		private void ParseResponse<T>(string methodName, string jsonText, Func<JsonData, T> parser, Action<T> success, RpcoderErrorHandler error)
+		{
+			Log(methodName + " responded " + jsonText);
+			try
+			{
+				var text = Validate(jsonText);
+				JsonData jsonData = JsonMapper.ToObject(text);
+				API.HandleDebugMessage(jsonData, Log);
+
+				var hasError = API.HandleError(jsonData, error);
+
+				if (!hasError)
+				{
+					success(parser(jsonData));
+					RaiseResponded(jsonData);
+				}
+			}
+			catch (JsonException)
+			{
+				error(RESTART, "Json parse Error\n" + jsonText, null);
+			}
+		}
+
+		private IEnumerable GetTextFromWww(string url, IDictionary<string, object> data, Action throwIfCancelRequested, Action<float> reportProgress, Action<string> success, Action<string> error)
+		{
+			foreach (string key in commonParameterList.Keys)
+			{
+				data[key] = commonParameterList[key];
+			}
+
+			string argsPath = string.Empty;
+			foreach (var item in commonParameterList)
+			{
+				argsPath = AddQueryDelimiter(argsPath);
+				argsPath += WWW.EscapeURL(item.Key) + "=" + WWW.EscapeURL(item.Value.ToString());
+
+			}
+
+			string fullPath = url + argsPath;
+			Log("request " + fullPath);
+
+			using (var www = new WWW(fullPath))
+			{
+				bool canceled = false;
+				while (!www.isDone && !canceled)
+				{
+					if (throwIfCancelRequested != null) throwIfCancelRequested();
+					if (reportProgress != null) reportProgress(www.progress);
+					yield return null;
+				}
+
+				if (www.error != null)
+				{
+					error(www.error);
+				}
+				else
+				{
+					success(www.text);
+				}
+			}
+		}
+
+		private IEnumerable PostTextFromWww(string url, JsonData data, Action throwIfCancelRequested, Action<float> reportProgress, Action<string> success, Action<string> error)
+		{
+			foreach (string key in commonParameterList.Keys)
+			{
+				data[key] = commonParameterList[key];
+			}
+
+			var json = data.ToJson();
+			byte[] byteArray = Encoding.UTF8.GetBytes(json == String.Empty ? " " : json);
+			Log("request " + url + " " + json);
+
+			using (var www = new WWW(url, byteArray))
+			{
+				bool canceled = false;
+				while (!www.isDone && !canceled)
+				{
+					if (throwIfCancelRequested != null) throwIfCancelRequested();
+					if (reportProgress != null) reportProgress(www.progress);
+					yield return null;
+				}
+
+				if (www.error != null)
+				{
+					error(www.error);
+				}
+				else
+				{
+					success(www.text);
+				}
+			}
+		}
+
+		public static bool HandleError(JsonData jsonData, RpcoderErrorHandler error)
+		{
+			JsonData errorJsonData;
+
+			if (!jsonData.TryGetValue("rpcoderError", out errorJsonData))
+				return false;
+
+			JsonData errorTypeJson;
+			
+			if(!errorJsonData.TryGetValue("errorType", out errorTypeJson))
+				return false;
+
+			string errorType = (string)errorTypeJson;
+
 			string message = "";
 			JsonData messageJson;
-			if(errorJsonData.TryGetValue("message", out messageJson))
+			if (errorJsonData.TryGetValue("message", out messageJson))
 			{
 				message = (string)messageJson;
 			}
 			JsonData targetSceneJson;
 			string targetScene = null;
-			if(errorJsonData.TryGetValue("targetScene", out targetSceneJson))
+			if (errorJsonData.TryGetValue("targetScene", out targetSceneJson))
 			{
 				targetScene = (string)targetSceneJson;
 			}
 			error(errorType, message, targetScene);
+			return true;
 		}
 
 		public static void HandleDebugMessage(JsonData jsonData, Action<string> logger)
