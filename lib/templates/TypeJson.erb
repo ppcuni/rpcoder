@@ -46,7 +46,7 @@ namespace <%= name_space %>
 					createdData.<%= field.name.to_s.camelize %> = JsonMapper.ToObject<<%= field.array_or_type %>>(temp.ToJson());
 					<%- else -%>
 						<%- if field.double? -%>
-					if(temp.<%= field.to_json_type? %>)
+					if(temp != null && temp.<%= field.to_json_type? %>)
 					{
 						createdData.<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)temp;
 					}
