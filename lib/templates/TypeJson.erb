@@ -15,7 +15,11 @@ namespace <%= name_space %>
 				<%- type.fields.each do |x| -%>
 				"\"<%= x.name.to_s %>\":" +
 				<%- if x.array? then -%>
+					<%- if x.optional? -%>
+					((<%= x.name.to_s.camelize %> != null) ? "[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToString()).ToArray()) + "]" : "null"),
+					<%- else -%>
 					"[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToString()).ToArray()) + "]",
+					<%- end -%>
 				<%- elsif x.array_or_type.to_s == "string" then  -%>
 					"\"" + <%= x.name.to_s.camelize %> + "\"",
 				<%- elsif x.array_or_type.to_s == "bool" then  -%>
