@@ -4,7 +4,7 @@ namespace <%= name_space %>
 {
 	using System.Collections.Generic;
 	using System.Linq;
-	using LitJson;
+	using LitJson.Aiming;
 	
 	public partial class <%= type.name %>
 	{
@@ -95,12 +95,12 @@ namespace <%= name_space %>
 
 		public static <%= type.name %>  Parse(string json)
 		{
-			return Create(LitJson.JsonMapper.ToObject(json));
+			return Create(LitJson.Aiming.JsonMapper.ToObject(json));
 		}
 
 		public static List<<%= type.name %>> ParseList(string json)
 		{
-			return CreateList(LitJson.JsonMapper.ToObject(json));
+			return CreateList(LitJson.Aiming.JsonMapper.ToObject(json));
 		}
 	}
 }
