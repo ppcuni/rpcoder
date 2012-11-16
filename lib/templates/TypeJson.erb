@@ -5,7 +5,7 @@ namespace <%= name_space %>
 	using System.Collections.Generic;
 	using System.Linq;
 	using LitJson.Aiming;
-	
+
 	public partial class <%= type.name %>
 	{
 		public override string ToString()
@@ -36,7 +36,7 @@ namespace <%= name_space %>
 
 			return "{" + string.Join(",", items) + "}";
 		}
-		
+
 		public static <%= type.name %> Create(JsonData jsonData)
 		{
 			if(jsonData == null) return null;
@@ -78,12 +78,12 @@ namespace <%= name_space %>
 					createdData.<%= field.name.to_s.camelize %> = null;
 				<%- end -%>
 			}
-			
+
 			<%- end -%>
-			
+
 			return createdData;
 		}
-		
+
 		public static List<<%= type.name %>> CreateList(JsonData jsonData)
 		{
 			if(jsonData == null) return null;
@@ -92,7 +92,7 @@ namespace <%= name_space %>
 			{
 				createdList.Add(<%= type.name %>.Create(jsonData[i]));
 			}
-			
+
 			return createdList;
 		}
 

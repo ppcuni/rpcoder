@@ -16,9 +16,9 @@ namespace <%= name_space %>
 		public const string TRANSITION	= "TRANSITION";
 		public const string RELOAD		= "RELOAD";
 		public const string UPDATE		= "UPDATE";
-		
+
 		public string BaseUrl { get; set; }
-		public RpcoderLogger Logger { get; set; } 
+		public RpcoderLogger Logger { get; set; }
 		private void Log(string log)
 		{
 			if(Logger != null) Logger(log);
@@ -65,7 +65,7 @@ namespace <%= name_space %>
 
 		public string DefaultErrorMessage { get; set; }
 		public RpcoderErrorHandler ErrorHandler { get; set; }
-		
+
 		public <%= api_class_name %>(string baseUrl)
 		{
 			BaseUrl = baseUrl;
@@ -192,7 +192,7 @@ namespace <%= name_space %>
 					error);
 			}
 		}
-		
+
 		<%- end -%>
 
 		private static JsonData ToJson<T>(List<T> list)
@@ -316,7 +316,7 @@ namespace <%= name_space %>
 				return false;
 
 			JsonData errorTypeJson;
-			
+
 			if(!errorJsonData.TryGetValue("errorType", out errorTypeJson))
 				return false;
 

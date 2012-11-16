@@ -17,7 +17,7 @@ namespace <%= name_space %>
 		void AddCommonParameter(string key, string value);
 		string RemoveCommonParameter(string key);
 		RpcoderErrorHandler ErrorHandler{ get; set; }
-		
+
 		<%- functions.each do |func| -%>
 		<%-
 			successHandler = "Action<" + func.name.camelize + "Response>"
@@ -39,7 +39,7 @@ namespace <%= name_space %>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
 		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, Action throwIfCancelRequested, Action<float> reportProgress);
-		
+
 		<%- end -%>
 	}
 
@@ -57,7 +57,7 @@ namespace <%= name_space %>
 		public string ErrorType { get; private set; }
 		public string Message { get; private set; }
 		public string TargetScene { get; private set; }
-		
+
 		public RpcoderError(string errorType, string message, string targetScene)
 		{
 			ErrorType = errorType;
