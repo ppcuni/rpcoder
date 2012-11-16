@@ -23,7 +23,9 @@ namespace <%= name_space %>
 				<%- elsif x.array_or_type.to_s == "string" then  -%>
 					"\"" + <%= x.name.to_s.camelize %> + "\"",
 				<%- elsif x.array_or_type.to_s == "bool" then  -%>
-					(<%= x.name.to_s.camelize %> ? "true" : "false"),
+					<%= x.name.to_s.camelize %>.ToString().ToLower(),
+				<%- elsif x.array_or_type.to_s == "bool?" then  -%>
+					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToString().ToLower() : "null"),
 				<%- elsif x.optional? -%>
 					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToString() : "null"),
 				<%- else -%>
