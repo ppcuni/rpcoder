@@ -6,11 +6,12 @@ module RPCoder
       [:int, :Int, :double, :Double, :string, :String, :bool, :Boolean, :Array]
     end
 
-    attr_accessor :name, :type, :options
+    attr_accessor :name, :type, :options, :description
     def initialize(name, type, options = {})
       @name = name
       @type = type
       @options = options
+      @description = options[:desc] if options[:desc]
     end
 
     def array?

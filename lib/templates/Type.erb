@@ -4,9 +4,19 @@ namespace <%= name_space %>
 {
 	using System.Collections.Generic;
 
+	<%- if type.description -%>
+	/// <summary>
+	/// <%= type.description %>
+	/// </summary>
+	<%- end -%>
 	public partial class <%= type.name %>
 	{
 		<%- type.fields.each do |field| -%>
+		<%- if field.description -%>
+		/// <summary>
+		/// <%= field.description %>
+		/// </summary>
+		<%- end -%>
 		public <%= field.array_or_type %> <%= field.name.to_s.camelize %> { get; set; }
 		<%- end -%>
 
