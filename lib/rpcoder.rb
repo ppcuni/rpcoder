@@ -3,10 +3,11 @@
 require 'erb'
 require 'rpcoder/function'
 require 'rpcoder/type'
+require 'rpcoder/enum'
 
 module RPCoder
   class << self
-    @@templates = ["API", "Interface", "Dummy", "DummyServer"]
+    @@templates = ["API", "Interface", "Dummy", "DummyServer", "EnumDefinitions"]
     @@extra_templates = []
 
     def name_space=(name_space)
@@ -47,6 +48,19 @@ module RPCoder
       yield func
       functions << func
       func
+    end
+
+    def enums
+      @enums ||= []
+    end
+
+    def enum(name)
+      enum = Enum.new
+      enum.name = name
+      yield enum
+      enums << enum
+      p enum
+      enum
     end
 
     def add_template(item_name, template_path)
