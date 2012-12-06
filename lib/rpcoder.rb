@@ -5,6 +5,8 @@ require 'rpcoder/function'
 require 'rpcoder/type'
 require 'rpcoder/enum'
 
+VERSION = "1.0.0"
+
 module RPCoder
   class << self
     @@templates = ["API", "Interface", "Dummy", "DummyServer", "EnumDefinitions"]
@@ -113,6 +115,10 @@ module RPCoder
     def clear
       functions.clear
       types.clear
+    end
+
+    def version
+      VERSION
     end
   end
 end
