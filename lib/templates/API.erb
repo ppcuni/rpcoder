@@ -128,9 +128,17 @@ namespace <%= name_space %>
 			<%- end -%>
 			{
 				<%- if i.array? -%>
-				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>);
+					<%- if not i.original_type? -%>
+				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>, (item) => JsonMapper.ToObject(item.ToString()));
+					<%- else -%>
+				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>, null);
+					<%- end -%>
 				<%- else -%>
+					<%- if not i.original_type? -%>
+				args["<%= i.name.to_s %>"] = JsonMapper.ToObject(<%= i.name.to_s.camelize(false) %>.ToString());
+					<%- else -%>
 				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
+					<%- end -%>
 				<%- end -%>
 			}
 			<%- end -%>
@@ -195,7 +203,7 @@ namespace <%= name_space %>
 
 		<%- end -%>
 
-		private static JsonData ToJson<T>(List<T> list)
+		private static JsonData ToJson<T>(List<T> list, Func<T, JsonData> decorator)
 		{
 			JsonData arrayData = new JsonData();
 			var count = list.Count;
@@ -203,7 +211,14 @@ namespace <%= name_space %>
 			{
 				for (int i = 0; i < count; ++i)
 				{
-					arrayData.Add(list[i]);
+					if(decorator != null)
+					{
+						arrayData.Add(decorator(list[i]));
+					}
+					else
+					{
+						arrayData.Add(list[i]);
+					}
 				}
 			}
 			else
@@ -245,7 +260,7 @@ namespace <%= name_space %>
 			}
 
 			string argsPath = string.Empty;
-			foreach (var item in commonParameterList)
+			foreach (var item in data)
 			{
 				argsPath = AddQueryDelimiter(argsPath);
 				argsPath += WWW.EscapeURL(item.Key) + "=" + WWW.EscapeURL(item.Value.ToString());
