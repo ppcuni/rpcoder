@@ -1,4 +1,4 @@
-require 'rpcoder/param'
+﻿require 'rpcoder/param'
 require 'camelizer'
 
 module RPCoder

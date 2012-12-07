@@ -1,4 +1,4 @@
-class String
+﻿class String
   def camelize(first_letter_in_uppercase = true)
     if first_letter_in_uppercase
       self.

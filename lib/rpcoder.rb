@@ -1,4 +1,4 @@
-# encoding: utf-8
+﻿# encoding: utf-8
 
 require 'erb'
 require 'rpcoder/function'
@@ -61,7 +61,6 @@ module RPCoder
       enum.name = name
       yield enum
       enums << enum
-      p enum
       enum
     end
 
@@ -78,7 +77,7 @@ module RPCoder
     end
 
     def render_erb(template, _binding)
-      ERB.new(File.read(template), nil, '-').result(_binding)
+      ERB.new(File.read(template, :encoding => Encoding::UTF_8), nil, '-').result(_binding)
     end
 
     def template_path(name)

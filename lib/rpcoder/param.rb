@@ -1,4 +1,4 @@
-require 'camelizer'
+﻿require 'camelizer'
 
 module RPCoder
   class Param
