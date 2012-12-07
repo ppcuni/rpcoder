@@ -19,7 +19,11 @@ module RPCoder
     end
 
     def optional?
-      options[:require] == false
+      options[:require] == false or options[:nullable] == true
+    end
+
+    def nullable_enum?
+      options[:nullable] == true
     end
 
     def array_or_type
@@ -73,7 +77,11 @@ module RPCoder
           return :bool
         end
       else
-        return type
+        if self.nullable_enum?
+          return type + "?"
+        else
+          return type
+        end
       end
     end
 

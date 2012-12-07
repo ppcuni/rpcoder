@@ -37,7 +37,30 @@ namespace <%= name_space %>
 			return "{" + string.Join(",", items) + "}";
 		}
 
-		public static <%= type.name %> Create(JsonData jsonData)
+		public static <%= type.name %> Parse(string json)
+		{
+			return JsonMapper.ToObject(json).Create(default(<%= type.name %>));
+		}
+
+		public static List<<%= type.name %>> ParseList(string json)
+		{
+			return JsonMapper.ToObject(json).Create(default(List<<%= type.name %>>));
+		}
+	}
+
+	public static partial class JsonExtensions
+	{
+		public static JsonData ToJsonData(this <%= type.name %> item)
+		{
+			return JsonMapper.ToObject(item.ToString());
+		}
+
+		public static JsonData ToJsonData(this IEnumerable<<%= type.name %>> list)
+		{
+			return list.ToJsonData(x => x.ToJsonData());
+		}
+
+		public static <%= type.name %> Create(this JsonData jsonData, <%= type.name %> dummy)
 		{
 			if(jsonData == null) return null;
 			<%= type.name %> createdData = new <%= type.name %>();
@@ -67,9 +90,9 @@ namespace <%= name_space %>
 					<%- end -%>
 				<%- else -%>
 					<%- if field.array? -%>
-					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.CreateList(temp);
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(List<<%= name_space %>.<%= field.type %>>));
 					<%- else -%>
-					createdData.<%= field.name.to_s.camelize %> = <%= name_space %>.<%= field.type %>.Create(temp);
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= name_space %>.<%= field.type %>));
 					<%- end -%>
 				<%- end -%>
 				}
@@ -84,26 +107,16 @@ namespace <%= name_space %>
 			return createdData;
 		}
 
-		public static List<<%= type.name %>> CreateList(JsonData jsonData)
+		public static List<<%= type.name %>> Create(this JsonData jsonData, List<<%= type.name %>> dummy)
 		{
 			if(jsonData == null) return null;
-			List<<%= type.name %>> createdList = new List<<%= type.name %>>();
+			var createdList = new List<<%= type.name %>>();
 			for(int i = 0; i < jsonData.Count; ++i)
 			{
-				createdList.Add(<%= type.name %>.Create(jsonData[i]));
+				createdList.Add(jsonData[i].Create(default(<%= type.name %>)));
 			}
 
 			return createdList;
-		}
-
-		public static <%= type.name %>  Parse(string json)
-		{
-			return Create(JsonMapper.ToObject(json));
-		}
-
-		public static List<<%= type.name %>> ParseList(string json)
-		{
-			return CreateList(JsonMapper.ToObject(json));
 		}
 	}
 }

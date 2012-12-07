@@ -4,6 +4,7 @@ using LitJson.Aiming;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using Aiming.IteratorTasks;
 
@@ -127,15 +128,11 @@ namespace <%= name_space %>
 			if (<%= i.name.to_s.camelize(false) %> != null)
 			<%- end -%>
 			{
-				<%- if i.array? -%>
-					<%- if not i.original_type? -%>
-				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>, (item) => JsonMapper.ToObject(item.ToString()));
-					<%- else -%>
-				args["<%= i.name.to_s %>"] = ToJson(<%= i.name.to_s.camelize(false) %>, null);
-					<%- end -%>
+				<%- if not i.original_type? -%>
+				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>.ToJsonData();
 				<%- else -%>
-					<%- if not i.original_type? -%>
-				args["<%= i.name.to_s %>"] = JsonMapper.ToObject(<%= i.name.to_s.camelize(false) %>.ToString());
+					<%- if i.array? -%>
+				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>.ToJsonData(null);
 					<%- else -%>
 				args["<%= i.name.to_s %>"] = <%= i.name.to_s.camelize(false) %>;
 					<%- end -%>
@@ -178,17 +175,13 @@ namespace <%= name_space %>
 					args = []
 					if func.has_return_type?
 						args = func.return_types.map {|param|
-							if param.array?
-								if param.original_type?
+							if not param.original_type?
+								param.name.to_s.camelize + " = jsonData.GetValueOrDefault(\"#{param.name}\").Create(default(#{param.array_or_type}))"
+							else
+								if param.array?
 									param.name.to_s.camelize + " = jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
 								else
-									param.name.to_s.camelize + " = #{param.type}.CreateList(jsonData.GetValueOrDefault(\"#{param.name}\"))"
-								end
-							else
-								if param.original_type?
 									param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.GetValueOrDefault(\"#{param.name}\")"
-								else
-									param.name.to_s.camelize + " = #{param.type}.Create(jsonData.GetValueOrDefault(\"#{param.name}\"))"
 								end
 							end
 						}
@@ -202,32 +195,6 @@ namespace <%= name_space %>
 		}
 
 		<%- end -%>
-
-		private static JsonData ToJson<T>(List<T> list, Func<T, JsonData> decorator)
-		{
-			JsonData arrayData = new JsonData();
-			var count = list.Count;
-			if (count > 0)
-			{
-				for (int i = 0; i < count; ++i)
-				{
-					if(decorator != null)
-					{
-						arrayData.Add(decorator(list[i]));
-					}
-					else
-					{
-						arrayData.Add(list[i]);
-					}
-				}
-			}
-			else
-			{
-				arrayData.Add(0);
-				arrayData.Clear();
-			}
-			return arrayData;
-		}
 
 		private void ParseResponse<T>(string methodName, string jsonText, Func<JsonData, T> parser, Action<T> success, RpcoderErrorHandler error)
 		{
@@ -360,6 +327,41 @@ namespace <%= name_space %>
 			{
 				logger((string)message);
 			}
+		}
+	}
+
+	public static partial class JsonExtensions
+	{
+		public static JsonData ToJsonData<T>(this IEnumerable<T> list, Func<T, JsonData> decorator)
+		{
+			JsonData arrayData = new JsonData();
+			var count = list.Count();
+			if (count > 0)
+			{
+				foreach(var i in list)
+				{
+					if(decorator != null)
+					{
+						arrayData.Add(decorator(i));
+					}
+					else
+					{
+						arrayData.Add(i);
+					}
+				}
+			}
+			else
+			{
+				arrayData.Add(0);
+				arrayData.Clear();
+			}
+			return arrayData;
+		}
+
+		public static string ToJson<T>(this IEnumerable<T> list)
+		{
+			if(list == null) return "";
+			return "[" + string.Join(",", list.Select(x => (x != null) ? x.ToString() : "null").ToArray()) + "]";
 		}
 	}
 }
