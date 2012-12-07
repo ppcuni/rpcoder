@@ -42,6 +42,15 @@
     e.add_constant :apple # 8
   end
 
+  RPCoder.function "echoEnum" do |f|
+    f.path        = "/echo/
+    f.method      = "POST"
+    f.add_param  :enum1, "EnumSample1" # 必須要素
+    f.add_param  :nullable_enum1, "EnumSample1", {:nullable => true} # 省略可能な要素 :nullableオプションはenum専用
+    f.add_return_type :enum, "EnumSample1"
+    f.description = 'メールを取得'
+  end
+
   RPCoder.function "getMail" do |f|
     f.path        = "/mails/:id" # => ("/mails/" + id)
     f.method      = "GET"
@@ -64,6 +73,7 @@
     f.add_param  :body,    "String"
     f.description = 'メールを送信'
   end
+
 
   # output codes
   dir = File.expand_path('src', File.dirname(__FILE__))
