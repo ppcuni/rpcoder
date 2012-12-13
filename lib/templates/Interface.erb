@@ -42,27 +42,4 @@ namespace <%= name_space %>
 
 		<%- end -%>
 	}
-
-	<%- functions.each do |func| -%>
-	public class <%= func.name.camelize + "Response" %>
-	{
-		<%- func.return_types.each do |i| -%>
-		public <%= i.array_or_type %> <%= i.name.to_s.camelize %>;
-		<%- end -%>
-	}
-
-	<%- end -%>
-	public class RpcoderError
-	{
-		public string ErrorType { get; private set; }
-		public string Message { get; private set; }
-		public string TargetScene { get; private set; }
-
-		public RpcoderError(string errorType, string message, string targetScene)
-		{
-			ErrorType = errorType;
-			Message = message;
-			TargetScene = targetScene;
-		}
-	}
 }

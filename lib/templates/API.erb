@@ -171,24 +171,8 @@ namespace <%= name_space %>
 			}
 			else
 			{
-				<%-
-					args = []
-					if func.has_return_type?
-						args = func.return_types.map {|param|
-							if not param.original_type?
-								param.name.to_s.camelize + " = jsonData.GetValueOrDefault(\"#{param.name}\").Create(default(#{param.array_or_type}))"
-							else
-								if param.array?
-									param.name.to_s.camelize + " = jsonData.ContainsKey(\"#{param.name}\") ? JsonMapper.ToObject<#{param.array_or_type}>(jsonData[\"#{param.name}\"].ToJson()) : null"
-								else
-									param.name.to_s.camelize + " = (#{param.array_or_type})jsonData.GetValueOrDefault(\"#{param.name}\")"
-								end
-							end
-						}
-					end
-				-%>
 				ParseResponse("<%= func.name.camelize %>", text,
-					jsonData => new <%= response %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>},
+					jsonData => <%= response %>.Parse(jsonData),
 					success,
 					error);
 			}

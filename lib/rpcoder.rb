@@ -5,11 +5,11 @@ require 'rpcoder/function'
 require 'rpcoder/type'
 require 'rpcoder/enum'
 
-VERSION = "1.0.1"
+VERSION = "1.0.2"
 
 module RPCoder
   class << self
-    @@templates = ["API", "Interface", "Dummy", "DummyServer", "EnumDefinitions"]
+    @@templates = ["API", "Interface", "Dummy", "DummyServer", "EnumDefinitions", "Responses", "JsonExtensions"]
     @@extra_templates = []
 
     def name_space=(name_space)
