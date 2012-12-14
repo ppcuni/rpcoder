@@ -6,11 +6,14 @@ using Aiming.IteratorTasks;
 
 namespace <%= name_space %>
 {
-	public class <%= api_class_name %>DummyServer : <%= api_class_name %>Interface
+	public partial class <%= api_class_name %>DummyServer : <%= api_class_name %>Interface
 	{
+		partial void Initialize();
+
 		public <%= api_class_name %>DummyServer(<%= api_class_name %>Interface api)
 		{
 			_api = api;
+			Initialize();
 		}
 
 		private <%= api_class_name %>Interface _api;
