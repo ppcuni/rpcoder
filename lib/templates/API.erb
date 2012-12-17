@@ -313,39 +313,4 @@ namespace <%= name_space %>
 			}
 		}
 	}
-
-	public static partial class JsonExtensions
-	{
-		public static JsonData ToJsonData<T>(this IEnumerable<T> list, Func<T, JsonData> decorator)
-		{
-			JsonData arrayData = new JsonData();
-			var count = list.Count();
-			if (count > 0)
-			{
-				foreach(var i in list)
-				{
-					if(decorator != null)
-					{
-						arrayData.Add(decorator(i));
-					}
-					else
-					{
-						arrayData.Add(i);
-					}
-				}
-			}
-			else
-			{
-				arrayData.Add(0);
-				arrayData.Clear();
-			}
-			return arrayData;
-		}
-
-		public static string ToJson<T>(this IEnumerable<T> list)
-		{
-			if(list == null) return "";
-			return "[" + string.Join(",", list.Select(x => (x != null) ? x.ToString() : "null").ToArray()) + "]";
-		}
-	}
 }

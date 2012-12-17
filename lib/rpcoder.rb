@@ -5,7 +5,7 @@ require 'rpcoder/function'
 require 'rpcoder/type'
 require 'rpcoder/enum'
 
-VERSION = "1.0.3"
+VERSION = "1.0.4"
 
 module RPCoder
   class << self
