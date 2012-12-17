@@ -20,6 +20,9 @@ namespace <%= name_space %>
 
 		public override string ToString()
 		{
+			<%- if func.return_types.empty? -%>
+			return "{}";
+			<%- else -%>
 			var items = new[]
 			{
 				<%- func.return_types.each do |x| -%>
@@ -39,6 +42,7 @@ namespace <%= name_space %>
 			};
 
 			return "{" + string.Join(",", items) + "}";
+			<%- end -%>
 		}
 
 		public static <%= response_name %> Parse(string json)
