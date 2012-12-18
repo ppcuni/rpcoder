@@ -46,7 +46,7 @@ namespace <%= name_space %>
 	{
 		public static string ToJson(this <%= type.name %> item)
 		{
-			return item.ToString();
+			return (item != null) ?  item.ToString() : "null";
 		}
 
 		public static JsonData ToJsonData(this <%= type.name %> item)

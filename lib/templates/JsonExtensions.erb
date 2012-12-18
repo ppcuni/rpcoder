@@ -20,8 +20,7 @@ namespace <%= name_space %>
 
 		public static string ToJson(this int? item)
 		{
-			if (!item.HasValue) return "null";
-			return item.ToString();
+			return item.HasValue ? item.Value.ToJson() : "null";
 		}
 
 		public static JsonData ToJsonData(this double item)
@@ -36,8 +35,7 @@ namespace <%= name_space %>
 
 		public static string ToJson(this double? item)
 		{
-			if (!item.HasValue) return "null";
-			return item.ToString();
+			return item.HasValue ? item.Value.ToJson() : "null";
 		}
 
 		public static JsonData ToJsonData(this string item)
@@ -63,8 +61,7 @@ namespace <%= name_space %>
 
 		public static string ToJson(this bool? item)
 		{
-			if (!item.HasValue) return "null";
-			return item.ToString().ToLower();
+			return item.HasValue ? item.Value.ToJson() : "null";
 		}
 
 		public static JsonData ToJsonData<T>(this IEnumerable<T> list, Func<T, JsonData> decorator)
@@ -122,7 +119,7 @@ namespace <%= name_space %>
 
 		public static string ToJson(this <%= enum.name.to_s.camelize %>? item)
 		{
-			return item.HasValue ? item.ToJson() : "null";
+			return item.HasValue ? item.Value.ToJson() : "null";
 		}
 
 
