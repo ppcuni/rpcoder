@@ -109,7 +109,7 @@ namespace <%= name_space %>
 
 		public static JsonData ToJsonData(this <%= enum.name.to_s.camelize %>? item)
 		{
-			return (int?)item;
+			return item.HasValue ? (int?)item : null;
 		}
 
 		public static string ToJson(this <%= enum.name.to_s.camelize %> item)

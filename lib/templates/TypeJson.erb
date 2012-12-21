@@ -89,9 +89,9 @@ namespace <%= name_space %>
 					<%- end -%>
 				<%- else -%>
 					<%- if field.array? -%>
-					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(List<<%= name_space %>.<%= field.type %>>));
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(List<<%= name_space %>.<%= field.to_c_sharp_type %>>));
 					<%- else -%>
-					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= name_space %>.<%= field.type %>));
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= name_space %>.<%= field.to_c_sharp_type %>));
 					<%- end -%>
 				<%- end -%>
 				}
