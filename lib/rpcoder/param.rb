@@ -28,7 +28,15 @@ module RPCoder
 
     def array_or_type
       if array?
-        "List<#{to_c_sharp_type}>"
+        if array?.is_a?(Numeric)
+          t = "List<#{to_c_sharp_type}>"
+          (array? - 1).times do
+            t = "List<#{t}>"
+          end
+          t
+        else
+          "List<#{to_c_sharp_type}>"
+        end
       else
         to_c_sharp_type
       end
