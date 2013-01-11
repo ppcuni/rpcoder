@@ -22,11 +22,13 @@ namespace <%= name_space %>
 
 		public <%= type.name %>() {}
 
+		<%- if type.fields.length > 0 -%>
 		public <%= type.name %>(<%= type.fields.map {|i| "#{i.array_or_type} #{i.name.to_s.camelize(false)}" }.join(', ') %>)
 		{
 			<%- type.fields.each do |field| -%>
 			this.<%= field.name.to_s.camelize %> = <%= field.name.to_s.camelize(false) %>;
 			<%- end -%>
 		}
+		<%- end -%>
 	}
 }
