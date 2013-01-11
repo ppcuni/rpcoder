@@ -4,7 +4,7 @@ require 'camelizer'
 module RPCoder
   class Function
     PARAMS_IN_URL_RE = /:[\w\d]+/
-    attr_accessor :name, :description, :path, :method, :return_type
+    attr_accessor :name, :description, :path, :method, :return_type, :array_type
 
     def params
       @params ||= []
@@ -19,6 +19,7 @@ module RPCoder
     end
 
     def add_param(name, type, options = {})
+      options[:array_type] = @array_type if options[:array_type] == nil
       params << Param.new(name, type, options)
     end
 
@@ -49,6 +50,7 @@ module RPCoder
     end
     
     def add_return_type(name, type, options = {})
+      options[:array_type] = @array_type if options[:array_type] == nil
       return_types << Param.new(name, type, options)
     end
   end

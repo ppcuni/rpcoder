@@ -36,9 +36,9 @@ namespace <%= name_space %>
 			return JsonMapper.ToObject(json).Create(default(<%= type.name %>));
 		}
 
-		public static List<<%= type.name %>> ParseList(string json)
+		public static <%= type.array %> ParseList(string json)
 		{
-			return JsonMapper.ToObject(json).Create(default(List<<%= type.name %>>));
+			return JsonMapper.ToObject(json).Create(default(<%= type.array %>));
 		}
 	}
 
@@ -89,9 +89,9 @@ namespace <%= name_space %>
 					<%- end -%>
 				<%- else -%>
 					<%- if field.array? -%>
-					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(List<<%= name_space %>.<%= field.to_c_sharp_type %>>));
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= field.array_or_type %>));
 					<%- else -%>
-					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= name_space %>.<%= field.to_c_sharp_type %>));
+					createdData.<%= field.name.to_s.camelize %> = temp.Create(default(<%= field.array_or_type %>));
 					<%- end -%>
 				<%- end -%>
 				}
@@ -106,14 +106,23 @@ namespace <%= name_space %>
 			return createdData;
 		}
 
-		public static List<<%= type.name %>> Create(this JsonData jsonData, List<<%= type.name %>> dummy)
+		public static <%= type.array %> Create(this JsonData jsonData, <%= type.array %> dummy)
 		{
 			if(jsonData == null) return null;
+			<%- if type.array_type == :array -%>
+			var count = jsonData.Count;
+			var createdList = new <%= type.name %>[count];
+			for(int i = 0; i < count; ++i)
+			{
+				createdList[i] = jsonData[i].Create(default(<%= type.name %>));
+			}
+			<%- else -%>
 			var createdList = new List<<%= type.name %>>();
 			for(int i = 0; i < jsonData.Count; ++i)
 			{
 				createdList.Add(jsonData[i].Create(default(<%= type.name %>)));
 			}
+			<%- end -%>
 
 			return createdList;
 		}

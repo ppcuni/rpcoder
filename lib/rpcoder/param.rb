@@ -26,16 +26,24 @@ module RPCoder
       options[:nullable] == true
     end
 
+    def array_type(t)
+      if options[:array_type] == :array
+        "#{t}[]"
+      else
+        "List<#{t}>"
+      end
+    end
+
     def array_or_type
       if array?
         if array?.is_a?(Numeric)
-          t = "List<#{to_c_sharp_type}>"
+          t = array_type(to_c_sharp_type)
           (array? - 1).times do
-            t = "List<#{t}>"
+            t = array_type(t)
           end
           t
         else
-          "List<#{to_c_sharp_type}>"
+          array_type(to_c_sharp_type)
         end
       else
         to_c_sharp_type

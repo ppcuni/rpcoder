@@ -28,6 +28,15 @@ module RPCoder
       @api_class_name
     end
 
+    def array_type=(type)
+      @array_type = type
+    end
+
+    def array_type
+      @array_type = :list if @array_type == nil
+      @array_type
+    end
+
     def types
       @types ||= []
     end
@@ -35,6 +44,7 @@ module RPCoder
     def type(name)
       type = Type.new
       type.name = name
+      type.array_type = self.array_type
       yield type
       types << type
       type
@@ -47,6 +57,7 @@ module RPCoder
     def function(name)
       func = Function.new
       func.name = name
+      func.array_type = self.array_type
       yield func
       functions << func
       func
@@ -59,6 +70,7 @@ module RPCoder
     def enum(name)
       enum = Enum.new
       enum.name = name
+      enum.array_type = self.array_type
       yield enum
       enums << enum
       enum

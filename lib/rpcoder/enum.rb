@@ -3,10 +3,24 @@ require 'camelizer'
 
 module RPCoder
   class Enum
-    attr_accessor :name, :description, :flags
+    attr_accessor :name, :description, :flags, :array_type
 
     def initialize
       @num = 0
+    end
+
+    def name
+      @name.to_s.camelize
+    end
+
+    def array(nullable = false)
+      n = self.name
+      n = n + "?" if nullable != false
+      if @array_type == :array
+        "#{n}[]"
+      else
+        "List<#{n}>"
+      end
     end
 
     def constants

@@ -102,78 +102,96 @@ namespace <%= name_space %>
 		}
 
 		<%- enums.each do |enum| -%>
-		public static JsonData ToJsonData(this <%= enum.name.to_s.camelize %> item)
+		public static JsonData ToJsonData(this <%= enum.name %> item)
 		{
 			return (int)item;
 		}
 
-		public static JsonData ToJsonData(this <%= enum.name.to_s.camelize %>? item)
+		public static JsonData ToJsonData(this <%= enum.name %>? item)
 		{
 			return item.HasValue ? (int?)item : null;
 		}
 
-		public static string ToJson(this <%= enum.name.to_s.camelize %> item)
+		public static string ToJson(this <%= enum.name %> item)
 		{
 			return ((int)item).ToJson();
 		}
 
-		public static string ToJson(this <%= enum.name.to_s.camelize %>? item)
+		public static string ToJson(this <%= enum.name %>? item)
 		{
 			return item.HasValue ? item.Value.ToJson() : "null";
 		}
 
 
-		public static JsonData ToJsonData(this IEnumerable<<%= enum.name.to_s.camelize %>> list)
+		public static JsonData ToJsonData(this IEnumerable<<%= enum.name %>> list)
 		{
 			return list.ToJsonData(x => (int)x);
 		}
 
-		public static JsonData ToJsonData(this IEnumerable<<%= enum.name.to_s.camelize %>?> list)
+		public static JsonData ToJsonData(this IEnumerable<<%= enum.name %>?> list)
 		{
 			return list.ToJsonData(x => (int?)x);
 		}
 
-		public static string ToJson(this IEnumerable<<%= enum.name.to_s.camelize %>> list)
+		public static string ToJson(this IEnumerable<<%= enum.name %>> list)
 		{
 			return list.ToJson(x => x.ToJson());
 		}
 
-		public static string ToJson(this IEnumerable<<%= enum.name.to_s.camelize %>?> list)
+		public static string ToJson(this IEnumerable<<%= enum.name %>?> list)
 		{
 			return list.ToJson(x => x.ToJson());
 		}
 
-		public static <%= enum.name.to_s.camelize %> Create(this JsonData jsonData, <%= enum.name.to_s.camelize %> dummy)
+		public static <%= enum.name %> Create(this JsonData jsonData, <%= enum.name %> dummy)
 		{
-			if(jsonData == null) return default(<%= enum.name.to_s.camelize %>);
-			return (<%= enum.name.to_s.camelize %>)(int)jsonData;
+			if(jsonData == null) return default(<%= enum.name %>);
+			return (<%= enum.name %>)(int)jsonData;
 		}
 
-		public static <%= enum.name.to_s.camelize %>? Create(this JsonData jsonData, <%= enum.name.to_s.camelize %>? dummy)
+		public static <%= enum.name %>? Create(this JsonData jsonData, <%= enum.name %>? dummy)
 		{
-			return (<%= enum.name.to_s.camelize %>?)(int?)jsonData;
+			return (<%= enum.name %>?)(int?)jsonData;
 		}
 
-		public static List<<%= enum.name.to_s.camelize %>> Create(this JsonData jsonData, List<<%= enum.name.to_s.camelize %>> dummy)
+		public static <%= enum.array %> Create(this JsonData jsonData, <%= enum.array %> dummy)
 		{
 			if(jsonData == null) return null;
-			var createdList = new List<<%= enum.name.to_s.camelize %>>();
+			<%- if enum.array_type == :array -%>
+			var count = jsonData.Count;
+			var createdList = new <%= enum.name %>[count];
+			for(int i = 0; i < count; ++i)
+			{
+				createdList[i] = jsonData[i].Create(default(<%= enum.name %>));
+			}
+			<%- else -%>
+			var createdList = new List<<%= enum.name %>>();
 			for(int i = 0; i < jsonData.Count; ++i)
 			{
-				createdList.Add(Create(jsonData[i], default(<%= enum.name.to_s.camelize %>)));
+				createdList.Add(Create(jsonData[i], default(<%= enum.name %>)));
 			}
+			<%- end -%>
 
 			return createdList;
 		}
 
-		public static List<<%= enum.name.to_s.camelize %>?> Create(this JsonData jsonData, List<<%= enum.name.to_s.camelize %>?> dummy)
+		public static <%= enum.array(:nullable) %> Create(this JsonData jsonData, <%= enum.array(:nullable) %> dummy)
 		{
 			if(jsonData == null) return null;
-			var createdList = new List<<%= enum.name.to_s.camelize %>?>();
+			<%- if enum.array_type == :array -%>
+			var count = jsonData.Count;
+			var createdList = new <%= enum.name %>?[count];
+			for(int i = 0; i < count; ++i)
+			{
+				createdList[i] = jsonData[i].Create(default(<%= enum.name %>?));
+			}
+			<%- else -%>
+			var createdList = new List<<%= enum.name %>?>();
 			for(int i = 0; i < jsonData.Count; ++i)
 			{
-				createdList.Add(Create(jsonData[i], default(<%= enum.name.to_s.camelize %>?)));
+				createdList.Add(Create(jsonData[i], default(<%= enum.name %>?)));
 			}
+			<%- end -%>
 
 			return createdList;
 		}
