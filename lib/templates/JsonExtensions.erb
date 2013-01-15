@@ -92,7 +92,23 @@ namespace <%= name_space %>
 
 		public static string ToJson<T>(this IEnumerable<T> list)
 		{
-			return list.ToJson(x => x.ToString());
+			return list.ToJson(x =>
+			{
+				if(x is bool)
+					return (bool)(object)x ? "true" : "false";
+				else
+					return x.ToString();
+			});
+		}
+
+		public static string ToJson<T>(this IEnumerable<T[]> list)
+		{
+			return list.ToJson(x => x.ToJson());
+		}
+
+		public static string ToJson<T>(this IEnumerable<T[][]> list)
+		{
+			return list.ToJson(x => x.ToJson());
 		}
 
 		public static string ToJson<T>(this IEnumerable<T> list, Func<T, string> decorator)
