@@ -14,7 +14,13 @@ namespace <%= name_space %>
 			{
 				<%- type.fields.each do |x| -%>
 				"\"<%= x.name.to_s %>\":" +
-				<%- if x.optional? -%>
+				<%- if x.array? then -%>
+					<%- if x.optional? -%>
+					((<%= x.name.to_s.camelize %> != null) ? "[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToJson()).ToArray()) + "]" : "null"),
+					<%- else -%>
+					"[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToJson()).ToArray()) + "]",
+					<%- end -%>
+				<%- elsif x.optional? -%>
 					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToJson() : "null"),
 				<%- else -%>
 					<%= x.name.to_s.camelize %>.ToJson(),
