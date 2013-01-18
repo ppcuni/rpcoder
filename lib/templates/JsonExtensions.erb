@@ -94,10 +94,13 @@ namespace <%= name_space %>
 		{
 			return list.ToJson(x =>
 			{
-				if(x is bool)
-					return (bool)(object)x ? "true" : "false";
+				var str = x.ToString();
+				if(str == "True")
+					return "true";
+				else if(str == "False")
+					return "false";
 				else
-					return x.ToString();
+					return str;
 			});
 		}
 
