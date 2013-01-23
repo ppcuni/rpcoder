@@ -61,7 +61,7 @@ namespace <%= name_space %>
 
 		public static <%= type.name %> Create(this JsonData jsonData, <%= type.name %> dummy)
 		{
-			if(jsonData == null) return null;
+			if(jsonData == null || !jsonData.IsObject) return null;
 			<%= type.name %> createdData = new <%= type.name %>();
 			
 			<%- type.fields.each do |field| -%>
@@ -108,7 +108,7 @@ namespace <%= name_space %>
 
 		public static <%= type.array %> Create(this JsonData jsonData, <%= type.array %> dummy)
 		{
-			if(jsonData == null) return null;
+			if(jsonData == null || !jsonData.IsArray) return null;
 			<%- if type.array_type == :array -%>
 			var count = jsonData.Count;
 			var createdList = new <%= type.name %>[count];

@@ -175,7 +175,7 @@ namespace <%= name_space %>
 
 		public static <%= enum.array %> Create(this JsonData jsonData, <%= enum.array %> dummy)
 		{
-			if(jsonData == null) return null;
+			if(jsonData == null || !jsonData.IsArray) return null;
 			<%- if enum.array_type == :array -%>
 			var count = jsonData.Count;
 			var createdList = new <%= enum.name %>[count];
@@ -196,7 +196,7 @@ namespace <%= name_space %>
 
 		public static <%= enum.array(:nullable) %> Create(this JsonData jsonData, <%= enum.array(:nullable) %> dummy)
 		{
-			if(jsonData == null) return null;
+			if(jsonData == null || !jsonData.IsArray) return null;
 			<%- if enum.array_type == :array -%>
 			var count = jsonData.Count;
 			var createdList = new <%= enum.name %>?[count];
