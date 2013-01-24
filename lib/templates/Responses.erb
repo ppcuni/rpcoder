@@ -52,6 +52,26 @@ namespace <%= name_space %>
 
 		public static <%= response_name %> Parse(JsonData jsonData)
 		{
+			return jsonData.Create(default(<%= response_name %>));
+		}
+	}
+
+	<%- end -%>
+
+	public static partial class JsonExtensions
+	{
+		<%- functions.each do |func| -%>
+		<%-
+			response_name = func.name.camelize + "Response"
+		-%>
+		public static string ToJson(this <%= response_name %> item)
+		{
+			return (item != null) ?  item.ToString() : "null";
+		}
+
+		public static <%= response_name %> Create(this JsonData jsonData, <%= response_name %> dummy)
+		{
+			if(jsonData == null || !jsonData.IsObject) return null;
 			<%-
 				args = []
 				if func.has_return_type?
@@ -70,9 +90,9 @@ namespace <%= name_space %>
 			-%>
 			return new <%= response_name %>(){<%= args.join(",\n\t\t\t\t\t\t\t") %>};
 		}
+		<%- end -%>
 	}
 
-	<%- end -%>
 	public class RpcoderError
 	{
 		public string ErrorType { get; private set; }
