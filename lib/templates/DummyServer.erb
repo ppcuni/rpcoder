@@ -96,7 +96,11 @@ namespace <%= name_space %>
 				<%- func.params.each do |i| -%>
 					<%= i.name.to_s.camelize %> = <%= i.name.to_s.camelize(false) %>,
 				<%- end -%>
-					Success = success,
+					Success = x =>
+					{
+						On<%= func.name.camelize %>Responded(x);
+						success(x);
+					},
 					Error = (error != null) ? error : ErrorHandler
 					});
 			}
@@ -112,6 +116,8 @@ namespace <%= name_space %>
 					);
 			}
 		}
+
+		partial void On<%= func.name.camelize %>Responded(<%= response %> response);
 
 		<%- end -%>
 	}

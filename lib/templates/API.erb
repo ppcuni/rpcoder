@@ -10,7 +10,7 @@ using Aiming.IteratorTasks;
 
 namespace <%= name_space %>
 {
-	public class <%= api_class_name %> : <%= api_class_name %>Interface
+	public partial class <%= api_class_name %> : <%= api_class_name %>Interface
 	{
 		public const string RESTART		= "RESTART";
 		public const string RETENTION	= "RETENTION";
@@ -173,10 +173,16 @@ namespace <%= name_space %>
 			{
 				ParseResponse("<%= func.name.camelize %>", text,
 					jsonData => <%= response %>.Parse(jsonData),
-					success,
+					x =>
+					{
+						On<%= func.name.camelize %>Responded(x);
+						success(x);
+					},
 					error);
 			}
 		}
+
+		partial void On<%= func.name.camelize %>Responded(<%= response %> response);
 
 		<%- end -%>
 
