@@ -44,7 +44,7 @@ namespace <%= name_space %>
 		<%-
 			response = func.name.camelize + "Response"
 			successHandler = "Action<" + response + ">"
-			params_excluded_error_handler = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
+			params_excluded_error_handler = func.params.map{|i| [i.query_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
 			params = params_excluded_error_handler + ['RpcoderErrorHandler error']
 		-%>
 		public IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>)

@@ -68,14 +68,14 @@ namespace <%= name_space %>
 		<%-
 			response = func.name.camelize + "Response"
 			successHandler = "Action<" + response + ">"
-			request_query = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') }
+			request_query = func.params.map{|i| [i.query_type, i.name.to_s.camelize(false)].join(' ') }
 			params_excluded_error_handler = request_query + [successHandler + ' success']
 			params = params_excluded_error_handler + ['RpcoderErrorHandler error']
 		-%>
 		public class <%= func.name.camelize %>Request
 		{
 			<%- func.params.each do |i| -%>
-			public <%= i.array_or_type %> <%= i.name.to_s.camelize %>;
+			public <%= i.query_type %> <%= i.name.to_s.camelize %>;
 			<%- end -%>
 			public <%= successHandler %> Success;
 			public RpcoderErrorHandler Error;

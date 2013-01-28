@@ -21,7 +21,7 @@ namespace <%= name_space %>
 		<%- functions.each do |func| -%>
 		<%-
 			successHandler = "Action<" + func.name.camelize + "Response>"
-			params_excluded_error_handler = func.params.map{|i| [i.array_or_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
+			params_excluded_error_handler = func.params.map{|i| [i.query_type, i.name.to_s.camelize(false)].join(' ') } + [successHandler + ' success']
 			params = params_excluded_error_handler + ['RpcoderErrorHandler error']
 		-%>
 		/// <summary>

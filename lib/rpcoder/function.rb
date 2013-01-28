@@ -20,7 +20,7 @@ module RPCoder
 
     def add_param(name, type, options = {})
       options[:array_type] = @array_type if options[:array_type] == nil
-      params << Param.new(name, type, options)
+      params << QueryParam.new(name, type, options)
     end
 
     def path_parts
@@ -52,6 +52,16 @@ module RPCoder
     def add_return_type(name, type, options = {})
       options[:array_type] = @array_type if options[:array_type] == nil
       return_types << Param.new(name, type, options)
+    end
+
+    class QueryParam < Param
+      def query_type
+        self.array_or_type
+      end
+
+      def array_type(t)
+        "IEnumerable<#{t}>"
+      end
     end
   end
 end
