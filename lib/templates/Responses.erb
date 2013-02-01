@@ -12,7 +12,7 @@ namespace <%= name_space %>
 	<%-
 		response_name = func.name.camelize + "Response"
 	-%>
-	public class <%= response_name %>
+	public partial class <%= response_name %>
 	{
 		<%- func.return_types.each do |i| -%>
 		public <%= i.array_or_type %> <%= i.name.to_s.camelize %>;
