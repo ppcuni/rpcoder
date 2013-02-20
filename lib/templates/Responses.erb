@@ -28,10 +28,17 @@ namespace <%= name_space %>
 				<%- func.return_types.each do |x| -%>
 				"\"<%= x.name.to_s %>\":" +
 				<%- if x.array? then -%>
+					<%-
+						if x.array?.is_a?(Numeric)
+							to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson((' + x.to_c_sharp_type.to_s + ' x) => x.ToJson())).ToArray()) + "]"'
+						else
+							to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson()).ToArray()) + "]"'
+						end
+					-%>
 					<%- if x.optional? -%>
-					((<%= x.name.to_s.camelize %> != null) ? "[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToJson()).ToArray()) + "]" : "null"),
+					((<%= x.name.to_s.camelize %> != null) ? <%= to_json %> : "null"),
 					<%- else -%>
-					"[" + string.Join(",", <%= x.name.to_s.camelize %>.Select(i => i.ToJson()).ToArray()) + "]",
+					<%= to_json %>,
 					<%- end -%>
 				<%- elsif x.optional? -%>
 					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToJson() : "null"),

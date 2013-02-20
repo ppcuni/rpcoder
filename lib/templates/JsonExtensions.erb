@@ -116,7 +116,7 @@ namespace <%= name_space %>
 
 		public static string ToJson<T>(this IEnumerable<T> list, Func<T, string> decorator)
 		{
-			if(list == null) return "";
+			if(list == null) return "null";
 			return "[" + string.Join(",", list.Select(x => (x != null) ? decorator(x) : "null").ToArray()) + "]";
 		}
 
