@@ -119,6 +119,10 @@ module RPCoder
       render_erb(template_path(template_name), binding)
     end
 
+    def render_params_to_s(params, indent)
+      render_erb(template_path("ParamsToString"), binding)
+    end
+
     def dir_to_export_classes(dir)
       File.join(dir, *name_space.split('.'))
     end

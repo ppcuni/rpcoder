@@ -23,32 +23,7 @@ namespace <%= name_space %>
 			<%- if func.return_types.empty? -%>
 			return "{}";
 			<%- else -%>
-			var items = new[]
-			{
-				<%- func.return_types.each do |x| -%>
-				"\"<%= x.name.to_s %>\":" +
-				<%- if x.array? then -%>
-					<%-
-						if x.array?.is_a?(Numeric)
-							to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson((' + x.to_c_sharp_type.to_s + ' x) => x.ToJson())).ToArray()) + "]"'
-						else
-							to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson()).ToArray()) + "]"'
-						end
-					-%>
-					<%- if x.optional? -%>
-					((<%= x.name.to_s.camelize %> != null) ? <%= to_json %> : "null"),
-					<%- else -%>
-					<%= to_json %>,
-					<%- end -%>
-				<%- elsif x.optional? -%>
-					((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToJson() : "null"),
-				<%- else -%>
-					<%= x.name.to_s.camelize %>.ToJson(),
-				<%- end -%>
-				<%- end -%>
-			};
-
-			return "{" + string.Join(",", items) + "}";
+			<%= render_params_to_s(func.return_types, 3) %>
 			<%- end -%>
 		}
 
