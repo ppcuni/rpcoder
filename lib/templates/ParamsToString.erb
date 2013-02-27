@@ -3,12 +3,15 @@ var items = new[]
 <%= i %>{
 	<%- params.each do |x| -%>
 <%= i %>	"\"<%= x.name.to_s %>\":" +
-	<%- if x.array? then -%>
 		<%-
-			if x.array?.is_a?(Numeric)
-				to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson((' + x.to_c_sharp_type.to_s + ' x) => x.ToJson())).ToArray()) + "]"'
+			if x.array?
+				if x.array?.is_a?(Numeric)
+					to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson((' + x.to_c_sharp_type.to_s + ' x) => x.ToJson())).ToArray()) + "]"'
+				else
+					to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson()).ToArray()) + "]"'
+				end
 			else
-				to_json = '"[" + string.Join(",", ' + x.name.to_s.camelize + '.Select(i => i.ToJson()).ToArray()) + "]"'
+				to_json = x.name.to_s.camelize + ".ToJson()"
 			end
 		-%>
 		<%- if x.optional? -%>
@@ -16,11 +19,6 @@ var items = new[]
 		<%- else -%>
 <%= i %>		<%= to_json %>,
 		<%- end -%>
-	<%- elsif x.optional? -%>
-<%= i %>		((<%= x.name.to_s.camelize %> != null) ? <%= x.name.to_s.camelize %>.ToJson() : "null"),
-	<%- else -%>
-<%= i %>		<%= x.name.to_s.camelize %>.ToJson(),
-	<%- end -%>
 	<%- end -%>
 <%= i %>};
 
