@@ -19,7 +19,7 @@ namespace <%= name_space %>
 		public const string UPDATE		= "UPDATE";
 
 		public string BaseUrl { get; set; }
-		public RpcoderLogger Logger { get; set; }
+		public Action<string> Logger { get; set; }
 		private void Log(string log)
 		{
 			if(Logger != null) Logger(log);

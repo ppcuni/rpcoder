@@ -7,13 +7,12 @@ namespace <%= name_space %>
 	using System.Collections.Generic;
 	using Aiming.IteratorTasks;
 
-	public delegate void RpcoderLogger(string log);
 	public delegate void RpcoderErrorHandler(string errorType, string message, string targetScene);
 
 	public interface <%= api_class_name %>Interface
 	{
 		string BaseUrl { get; set; }
-		RpcoderLogger Logger { get; set; }
+		Action<string> Logger { get; set; }
 		void AddCommonParameter(string key, string value);
 		string RemoveCommonParameter(string key);
 		RpcoderErrorHandler ErrorHandler{ get; set; }
