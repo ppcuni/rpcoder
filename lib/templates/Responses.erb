@@ -77,6 +77,12 @@ namespace <%= name_space %>
 
 	public class RpcoderError
 	{
+		public const string RESTART	= "RESTART";
+		public const string RETENTION	= "RETENTION";
+		public const string TRANSITION	= "TRANSITION";
+		public const string RELOAD	= "RELOAD";
+		public const string UPDATE	= "UPDATE";
+
 		public string ErrorType { get; private set; }
 		public string Message { get; private set; }
 		public string TargetScene { get; private set; }
