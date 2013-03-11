@@ -121,6 +121,19 @@ namespace <%= name_space %>
 		}
 
 		<%- enums.each do |enum| -%>
+		public static string GetDescription(this <%= enum.name %> item)
+		{
+			switch(item)
+			{
+			<%- enum.constants.each do |constant| -%>
+			case <%= enum.name %>.<%= constant.name.to_s.camelize %>:
+				return @"<%= constant.description %>";
+			<%- end -%>
+			default:
+				return string.Empty;
+			}
+		}
+
 		public static JsonData ToJsonData(this <%= enum.name %> item)
 		{
 			return (int)item;
