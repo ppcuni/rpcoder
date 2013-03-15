@@ -20,7 +20,20 @@ namespace <%= name_space %>
 		public <%= field.array_or_type %> <%= field.name.to_s.camelize %> { get; set; }
 		<%- end -%>
 
-		public <%= type.name %>() {}
+		public <%= type.name %>()
+		{
+		<%- type.fields.each do |field| -%>
+		    <%- if !field.default.nil? -%>
+		      <%- if field.to_c_sharp_type == :string -%>
+			<%= field.name.to_s.camelize %> = @"<%= field.default %>";
+		      <%- elsif field.original_type? -%>
+			<%= field.name.to_s.camelize %> = <%= field.default %>;
+		      <%- else -%>
+			<%= field.name.to_s.camelize %> = (<%= field.array_or_type %>)<%= field.default %>;
+		      <%- end -%>
+		    <%- end -%>
+		<%- end -%>
+		}
 
 		<%- if type.fields.length > 0 -%>
 		public <%= type.name %>(<%= type.fields.map {|i| "#{i.array_or_type} #{i.name.to_s.camelize(false)}" }.join(', ') %>)

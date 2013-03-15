@@ -23,6 +23,11 @@ module RPCoder
     end
 
     class Field < Param
+      attr_accessor :default
+      def initialize(name, type, options = {})
+        super(name, type, options)
+        @default = options[:default]
+      end
     end
   end
 end
