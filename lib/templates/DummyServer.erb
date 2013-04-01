@@ -56,6 +56,12 @@ namespace <%= name_space %>
 		}
 
 		public event Action<JsonData> Responded;
+		private void RaiseResponded(JsonData jsonData)
+		{
+			var d = Responded;
+			if (d != null) d(jsonData);
+		}
+
 		public Func<string, string> CustomValidator { get; set; }
 
 		public void AddCommonParameter(string key, string value)
