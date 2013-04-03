@@ -80,6 +80,16 @@ namespace <%= name_space %>
 			RpcoderErrorHandler Error { get; set; }
 		}
 
+		private IEnumerator RunWithCancellationToken(IEnumerator logic, Action throwIfCancelRequested)
+		{
+				while(logic.MoveNext())
+				{
+					if(throwIfCancelRequested != null)
+					throwIfCancelRequested();
+					yield return logic.Current;
+				}
+		}
+
 		<%- functions.each do |func| -%>
 		<%-
 			response = func.name.camelize + "Response"
@@ -116,7 +126,7 @@ namespace <%= name_space %>
 		{
 			if(<%= func.name.camelize %>Logic != null)
 			{
-				return <%= func.name.camelize %>Logic(new <%= func.name.camelize %>Request(){
+				var logic = <%= func.name.camelize %>Logic(new <%= func.name.camelize %>Request(){
 				<%- func.params.each do |i| -%>
 					<%= i.name.to_s.camelize %> = <%= i.name.to_s.camelize(false) %>,
 				<%- end -%>
@@ -127,6 +137,7 @@ namespace <%= name_space %>
 					},
 					Error = (error != null) ? error : ErrorHandler
 					});
+				return RunWithCancellationToken(logic, throwIfCancelRequested);
 			}
 			else
 			{
