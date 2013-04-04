@@ -26,4 +26,19 @@ namespace <%= name_space %>
 	}
 
 	<%- end -%>
+	public static class EnumUtility
+	{
+	<%- enums.each do |enum| -%>
+		public static IEnumerable<<%= enum.name.to_s.camelize %>> <%= enum.name.to_s.camelize %>Values
+		{
+			get
+			{
+				<%- enum.constants.each do |i| -%>
+				yield return <%= enum.name.to_s.camelize %>.<%= i.name.to_s.camelize %>;
+				<%- end -%>
+			}
+		}
+
+	<%- end -%>
+	}
 }
