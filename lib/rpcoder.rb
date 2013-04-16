@@ -37,6 +37,16 @@ module RPCoder
       @array_type
     end
 
+    def generate_primitive_to_json=(value)
+      @generate_primitive_to_json = value
+    end
+
+    def generate_primitive_to_json
+      @generate_primitive_to_json = true if @generate_primitive_to_json == nil
+      @generate_primitive_to_json
+    end
+
+
     def types
       @types ||= []
     end

@@ -15,7 +15,7 @@ namespace <%= name_space %>
 	public partial class <%= response_name %>
 	{
 		<%- func.return_types.each do |i| -%>
-		public <%= i.array_or_type %> <%= i.name.to_s.camelize %>;
+		public <%= i.array_or_type %> <%= i.name.to_s.camelize %> { get; set; }
 		<%- end -%>
 
 		public override string ToString()

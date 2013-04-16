@@ -8,6 +8,7 @@ namespace <%= name_space %>
 {
 	public static partial class JsonExtensions
 	{
+		<%- if generate_primitive_to_json -%>
 		public static JsonData ToJsonData(this int item)
 		{
 			return item;
@@ -63,6 +64,7 @@ namespace <%= name_space %>
 		{
 			return item.HasValue ? item.Value.ToJson() : "null";
 		}
+		<%- end -%>
 
 		public static JsonData ToJsonData<T>(this IEnumerable<T> list, Func<T, JsonData> decorator)
 		{
