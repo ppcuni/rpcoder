@@ -10,7 +10,7 @@ using Aiming.IteratorTasks;
 
 namespace <%= name_space %>
 {
-	public partial class <%= api_class_name %> : <%= api_class_name %>Interface
+	public partial class <%= api_class_name %> : <%= api_class_name %>Interface, IResponseRaiser
 	{
 		public const string RESTART		= RpcoderError.RESTART;
 		public const string RETENTION	= RpcoderError.RETENTION;
@@ -27,7 +27,7 @@ namespace <%= name_space %>
 		}
 
 		public event Action<JsonData> Responded;
-		private void RaiseResponded(JsonData jsonData)
+		void IResponseRaiser.RaiseResponded(JsonData jsonData)
 		{
 			var d = Responded;
 			if (d != null) d(jsonData);
@@ -201,7 +201,7 @@ namespace <%= name_space %>
 				if (!hasError)
 				{
 					success(parser(jsonData));
-					RaiseResponded(jsonData);
+					((IResponseRaiser)this).RaiseResponded(jsonData);
 				}
 			}
 			catch (JsonException)

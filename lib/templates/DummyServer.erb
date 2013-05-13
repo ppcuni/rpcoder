@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace <%= name_space %>
 {
-	public partial class <%= api_class_name %>DummyServer : <%= api_class_name %>Interface
+	public partial class <%= api_class_name %>DummyServer : <%= api_class_name %>Interface, IResponseRaiser
 	{
 		partial void Initialize();
 
@@ -56,10 +56,13 @@ namespace <%= name_space %>
 		}
 
 		public event Action<JsonData> Responded;
-		private void RaiseResponded(JsonData jsonData)
+		void IResponseRaiser.RaiseResponded(JsonData jsonData)
 		{
 			var d = Responded;
 			if (d != null) d(jsonData);
+
+			var raiser = _api as IResponseRaiser;
+			if(raiser != null) raiser.RaiseResponded(jsonData);
 		}
 
 		public Func<string, string> CustomValidator { get; set; }
@@ -134,6 +137,7 @@ namespace <%= name_space %>
 					{
 						On<%= func.name.camelize %>Responded(x);
 						success(x);
+						((IResponseRaiser)this).RaiseResponded(JsonMapper.ToObject(x.ToJson()));
 					},
 					Error = (error != null) ? error : ErrorHandler
 					});

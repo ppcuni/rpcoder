@@ -44,4 +44,9 @@ namespace <%= name_space %>
 
 		<%- end -%>
 	}
+
+	public interface IResponseRaiser
+	{
+		void RaiseResponded(JsonData jsonData);
+	}
 }
