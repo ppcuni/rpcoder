@@ -55,12 +55,20 @@ namespace <%= name_space %>
 			}
 		}
 
-		public event Action<JsonData> Responded;
+		public event Action<JsonData> Responded
+		{
+			add
+			{
+				_api.Responded += value;
+			}
+			remove
+			{
+				_api.Responded -= value;
+			}
+		}
+
 		void IResponseRaiser.RaiseResponded(JsonData jsonData)
 		{
-			var d = Responded;
-			if (d != null) d(jsonData);
-
 			var raiser = _api as IResponseRaiser;
 			if(raiser != null) raiser.RaiseResponded(jsonData);
 		}
