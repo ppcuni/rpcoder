@@ -166,9 +166,9 @@ namespace <%= name_space %>
 			if (errorText != null)
 			{
 				<%- if func.is_get? -%>
-					error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + "\n" + errorText : ""), null);
+					error(TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + "\n" + errorText : ""), null);
 				<%- else -%>
-					error(RETENTION, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + args.ToJson() + "\n" + errorText : ""), null);
+					error(TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + args.ToJson() + "\n" + errorText : ""), null);
 				<%- end -%>
 			}
 			else
