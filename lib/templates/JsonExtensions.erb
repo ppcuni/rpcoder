@@ -136,6 +136,20 @@ namespace <%= name_space %>
 			}
 		}
 
+		<%- if enum.flags -%>
+		public static JsonData HasFlag(this <%= enum.name %> item, <%= enum.name %> flag)
+		{
+			return (item & flag) != 0;
+		}
+
+		public static JsonData HasFlag(this <%= enum.name %>? item, <%= enum.name %> flag)
+		{
+			return item.HasValue
+				? item.Value.HasFlag(flag)
+				: false;
+		}
+		<%- end -%>
+
 		public static JsonData ToJsonData(this <%= enum.name %> item)
 		{
 			return (int)item;
