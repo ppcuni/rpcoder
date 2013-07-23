@@ -10,6 +10,8 @@ namespace <%= name_space %>
 
 	public delegate void RpcoderErrorHandler(string errorType, string message, string targetScene);
 
+#pragma warning disable 0108
+
 	public partial interface <%= api_class_name %>Interface
 	{
 		string BaseUrl { get; set; }
@@ -32,7 +34,7 @@ namespace <%= name_space %>
 		<%- func.params.each do |param| -%>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		new IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>);
+		IEnumerator <%= func.name.camelize %>(<%= params_excluded_error_handler.join(', ') %>);
 
 		/// <summary>
 		/// <%= func.description %>
@@ -40,7 +42,7 @@ namespace <%= name_space %>
 		<%- func.params.each do |param| -%>
 		/// <param name="<%= param.name.to_s.camelize(false) %>"><%= param.options[:description] %></param>
 		<%- end -%>
-		new IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, Action throwIfCancelRequested, Action<float> reportProgress);
+		IEnumerator <%= func.name.camelize %>(<%= params.join(', ') %>, Action throwIfCancelRequested, Action<float> reportProgress);
 
 		<%- end -%>
 	}
