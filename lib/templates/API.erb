@@ -190,7 +190,7 @@ namespace <%= name_space %>
 
 		private void ParseResponse<T>(string methodName, string jsonText, Func<JsonData, T> parser, Action<T> success, RpcoderErrorHandler error)
 		{
-			Log(methodName + " responded " + jsonText);
+			Log("{ \"key\": \"" + methodName + "\", \"respond\": " + jsonText + "}");
 			try
 			{
 				var text = Validate(jsonText);
