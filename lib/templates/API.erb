@@ -12,14 +12,6 @@ namespace <%= name_space %>
 {
 	public partial class <%= api_class_name %> : <%= api_class_name %>Interface, IResponseRaiser
 	{
-		public const string RESTART		= RpcoderError.RESTART;
-		public const string RETENTION	= RpcoderError.RETENTION;
-		public const string TRANSITION	= RpcoderError.TRANSITION;
-		public const string RELOAD		= RpcoderError.RELOAD;
-		public const string UPDATE		= RpcoderError.UPDATE;
-		public const string TIMEOUT		= RpcoderError.TIMEOUT;
-		public const string SESSION_TIMEOUT	= RpcoderError.SESSION_TIMEOUT;
-
 		public string BaseUrl { get; set; }
 		public Action<string> Logger { get; set; }
 		private void Log(string log)
@@ -166,9 +158,9 @@ namespace <%= name_space %>
 			if (errorText != null)
 			{
 				<%- if func.is_get? -%>
-					error(TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + "\n" + errorText : ""), null);
+					error(RpcoderError.TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + "\n" + errorText : ""), null);
 				<%- else -%>
-					error(TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + args.ToJson() + "\n" + errorText : ""), null);
+					error(RpcoderError.TIMEOUT, DefaultErrorMessage + (Debug.isDebugBuild ? "\n" + this.BaseUrl + path + " " + args.ToJson() + "\n" + errorText : ""), null);
 				<%- end -%>
 			}
 			else
@@ -207,7 +199,7 @@ namespace <%= name_space %>
 			}
 			catch (JsonException)
 			{
-				error(RESTART, "Json parse Error\n" + jsonText, null);
+				error(RpcoderError.RESTART, "Json parse Error\n" + jsonText, null);
 			}
 		}
 
